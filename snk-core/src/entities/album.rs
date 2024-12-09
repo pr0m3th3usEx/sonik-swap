@@ -1,9 +1,10 @@
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 use chrono::{DateTime, Utc};
+use url::Url;
 
 use crate::value_objects::{
-    image_cover::ImageCover, product_id::ProductId, provider_url::ProviderUrl,
+    image_cover::ImageCover, product_id::ProductId, provider::Provider
 };
 
 pub struct Album {
@@ -11,7 +12,7 @@ pub struct Album {
     name: String,
     release_date: DateTime<Utc>,
     covers: HashSet<ImageCover>,
-    provider_urls: HashSet<ProviderUrl>,
+    provider_urls: HashMap<Provider, Url>,
 }
 
 impl Album {
@@ -20,7 +21,7 @@ impl Album {
         name: String,
         release_date: DateTime<Utc>,
         covers: HashSet<ImageCover>,
-        provider_urls: HashSet<ProviderUrl>,
+        provider_urls: HashMap<Provider, Url>,
     ) -> Self {
         Self {
             ids,
@@ -47,7 +48,7 @@ impl Album {
         &self.covers
     }
 
-    pub fn provider_urls(&self) -> &HashSet<ProviderUrl> {
+    pub fn provider_urls(&self) -> &HashMap<Provider, Url> {
         &self.provider_urls
     }
 }

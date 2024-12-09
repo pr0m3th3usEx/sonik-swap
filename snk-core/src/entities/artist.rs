@@ -1,22 +1,24 @@
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
+
+use url::Url;
 
 use crate::value_objects::{
-    artist_id::ArtistId, image_cover::ImageCover, provider_url::ProviderUrl,
+    image_cover::ImageCover, provider::Provider
 };
 
 pub struct Artist {
-    ids: HashSet<ArtistId>,
+    ids: HashMap<Provider, String>,
     name: String,
     images: HashSet<ImageCover>,
-    provider_urls: HashSet<ProviderUrl>,
+    provider_urls: HashMap<Provider, Url>,
 }
 
 impl Artist {
     pub fn new(
-        ids: HashSet<ArtistId>,
+        ids: HashMap<Provider, String>,
         name: String,
         images: HashSet<ImageCover>,
-        provider_urls: HashSet<ProviderUrl>,
+        provider_urls: HashMap<Provider, Url>,
     ) -> Self {
         Self {
             ids,
@@ -26,7 +28,7 @@ impl Artist {
         }
     }
 
-    pub fn ids(&self) -> &HashSet<ArtistId> {
+    pub fn ids(&self) -> &HashMap<Provider, String> {
         &self.ids
     }
 
@@ -38,7 +40,7 @@ impl Artist {
         &self.images
     }
 
-    pub fn provider_urls(&self) -> &HashSet<ProviderUrl> {
+    pub fn provider_urls(&self) -> &HashMap<Provider, Url> {
         &self.provider_urls
     }
 }

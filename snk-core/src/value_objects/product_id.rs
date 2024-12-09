@@ -1,10 +1,11 @@
+use super::provider::Provider;
+
 #[derive(Hash)]
 pub enum ProductId {
     ISRC(String),
     UPC(String),
     EAN(String),
-    Spotify(String),
-    Deezer(String),
+    Provider((Provider, String))
 }
 
 impl ProductId {
@@ -13,8 +14,7 @@ impl ProductId {
             ProductId::ISRC(id) => id,
             ProductId::UPC(id) => id,
             ProductId::EAN(id) => id,
-            ProductId::Spotify(id) => id,
-            ProductId::Deezer(id) => id,
+            ProductId::Provider((_, id)) => id,
         }
     }
 }
