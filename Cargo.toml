@@ -7,3 +7,4 @@ members = ["applications/api", "snk-core"]
 [workspace.dependencies]
 chrono = "0.4.38"
 thiserror = "2.0.5"
+url = "2.5.4"

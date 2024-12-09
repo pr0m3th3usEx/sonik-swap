@@ -12,16 +12,15 @@ async fn main() {
         .with(tracing_subscriber::fmt::layer())
         .init();
 
-
     // TODO API routes
-    // 
+    //
     // - GET  /auth/{providerId}: Return OAuth2 authentication URL + ?=state=providerId
     // - GET  /auth/callback: FindOrCreate user account
     //
     // - GET  /user/me: Current logged in user information
     // - POST /user/tracks: Add tracks in user liked/favourite tracks
     // - DELETE /user/tracks: Delete tracks in user liked/favourite tracks
-    // 
+    //
     // - POST /providers: Init permission request for a user 3rd party account
     // - GET  /providers/grant: OAuth2 callback for permissions granting
     // - GET  /providers/status: Get connection status of user's providers
