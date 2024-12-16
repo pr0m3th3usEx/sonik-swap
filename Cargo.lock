@@ -3,6 +3,16 @@
 version = 3
 
 [[package]]
+name = "adapters"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "snk-core",
+ "url",
+ "uuid",
+]
+
+[[package]]
 name = "addr2line"
 version = "0.24.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -933,16 +943,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
-]
-
-[[package]]
-name = "test-utils"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "snk-core",
- "url",
- "uuid",
 ]
 
 [[package]]

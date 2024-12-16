@@ -2,7 +2,7 @@
 name = "sonik-swap"
 resolver = '2'
 
-members = ["applications/api", "snk-core", "test-utils"]
+members = ["adapters", "applications/api", "snk-core"]
 
 [workspace.dependencies]
 chrono = "0.4.38"
@@ -13,4 +13,4 @@ uuid = { version = "1.11.0", features = ["std", "v4"] }
 
 # Business core
 snk-core = { path = "./snk-core" }
-test-utils = { path = "./test-utils" }
+adapters = { path = "./adapters" }

@@ -2,10 +2,10 @@ use std::collections::HashSet;
 
 use url::Url;
 
-use crate::value_objects::{image_cover::ImageCover, provider::provider_id::ProviderId};
+use crate::value_objects::{image_cover::ImageCover, playlist_id::PlaylistId, provider::provider_id::ProviderId};
 
 pub struct Playlist {
-    id: String,
+    id: PlaylistId,
     name: String,
     covers: HashSet<ImageCover>,
     owner: String, // Name of the owner (We won't use other metadata for now)
@@ -16,7 +16,7 @@ pub struct Playlist {
 
 impl Playlist {
     pub fn new(
-        id: String,
+        id: PlaylistId,
         name: String,
         covers: HashSet<ImageCover>,
         owner: String,
@@ -35,7 +35,7 @@ impl Playlist {
         }
     }
 
-    pub fn id(&self) -> &String {
+    pub fn id(&self) -> &PlaylistId {
         &self.id
     }
 
