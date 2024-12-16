@@ -4,7 +4,7 @@ use chrono::{DateTime, Utc};
 use url::Url;
 
 use crate::value_objects::{
-    image_cover::ImageCover, product_id::ProductId, provider::Provider
+    image_cover::ImageCover, product_id::ProductId, provider::provider_id::ProviderId,
 };
 
 pub struct Album {
@@ -12,7 +12,7 @@ pub struct Album {
     name: String,
     release_date: DateTime<Utc>,
     covers: HashSet<ImageCover>,
-    provider_urls: HashMap<Provider, Url>,
+    provider_urls: HashMap<ProviderId, Url>,
 }
 
 impl Album {
@@ -21,7 +21,7 @@ impl Album {
         name: String,
         release_date: DateTime<Utc>,
         covers: HashSet<ImageCover>,
-        provider_urls: HashMap<Provider, Url>,
+        provider_urls: HashMap<ProviderId, Url>,
     ) -> Self {
         Self {
             ids,
@@ -48,7 +48,7 @@ impl Album {
         &self.covers
     }
 
-    pub fn provider_urls(&self) -> &HashMap<Provider, Url> {
+    pub fn provider_urls(&self) -> &HashMap<ProviderId, Url> {
         &self.provider_urls
     }
 }

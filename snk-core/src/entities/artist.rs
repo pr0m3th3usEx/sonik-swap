@@ -2,23 +2,21 @@ use std::collections::{HashMap, HashSet};
 
 use url::Url;
 
-use crate::value_objects::{
-    image_cover::ImageCover, provider::Provider
-};
+use crate::value_objects::{image_cover::ImageCover, provider::provider_id::ProviderId};
 
 pub struct Artist {
-    ids: HashMap<Provider, String>,
+    ids: HashMap<ProviderId, String>,
     name: String,
     images: HashSet<ImageCover>,
-    provider_urls: HashMap<Provider, Url>,
+    provider_urls: HashMap<ProviderId, Url>,
 }
 
 impl Artist {
     pub fn new(
-        ids: HashMap<Provider, String>,
+        ids: HashMap<ProviderId, String>,
         name: String,
         images: HashSet<ImageCover>,
-        provider_urls: HashMap<Provider, Url>,
+        provider_urls: HashMap<ProviderId, Url>,
     ) -> Self {
         Self {
             ids,
@@ -28,7 +26,7 @@ impl Artist {
         }
     }
 
-    pub fn ids(&self) -> &HashMap<Provider, String> {
+    pub fn ids(&self) -> &HashMap<ProviderId, String> {
         &self.ids
     }
 
@@ -40,7 +38,7 @@ impl Artist {
         &self.images
     }
 
-    pub fn provider_urls(&self) -> &HashMap<Provider, Url> {
+    pub fn provider_urls(&self) -> &HashMap<ProviderId, Url> {
         &self.provider_urls
     }
 }

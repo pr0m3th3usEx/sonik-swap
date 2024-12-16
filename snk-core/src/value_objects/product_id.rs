@@ -1,11 +1,11 @@
-use super::provider::Provider;
+use super::provider::provider_id::ProviderId;
 
 #[derive(Hash)]
 pub enum ProductId {
     ISRC(String),
     UPC(String),
     EAN(String),
-    Provider((Provider, String))
+    Provider((ProviderId, String)),
 }
 
 impl ProductId {

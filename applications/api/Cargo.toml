@@ -8,3 +8,6 @@ axum = "0.7.9"
 tokio = { version = "1.42.0", features = ['full'] }
 tracing = "0.1.41"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Business core
+snk-core.workspace = true
