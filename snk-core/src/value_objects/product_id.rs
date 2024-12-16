@@ -1,6 +1,6 @@
 use super::provider::provider_id::ProviderId;
 
-#[derive(Hash)]
+#[derive(Hash, PartialEq, Eq)]
 pub enum ProductId {
     ISRC(String),
     UPC(String),
@@ -14,7 +14,7 @@ impl ProductId {
             ProductId::ISRC(id) => id,
             ProductId::UPC(id) => id,
             ProductId::EAN(id) => id,
-            ProductId::Provider((_, id)) => id,
+            ProductId::Provider((_, id)) => &id,
         }
     }
 }

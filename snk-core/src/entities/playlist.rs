@@ -2,7 +2,9 @@ use std::collections::HashSet;
 
 use url::Url;
 
-use crate::value_objects::{image_cover::ImageCover, playlist_id::PlaylistId, provider::provider_id::ProviderId};
+use crate::value_objects::{
+    image_cover::ImageCover, playlist_id::PlaylistId, provider::provider_id::ProviderId,
+};
 
 pub struct Playlist {
     id: PlaylistId,

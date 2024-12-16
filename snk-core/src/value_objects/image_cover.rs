@@ -1,5 +1,6 @@
 use url::Url;
 
+#[derive(Hash, PartialEq, Eq)]
 pub enum ImageCover {
     Sm(Url),
     Md(Url),

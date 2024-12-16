@@ -51,8 +51,8 @@ pub struct TrackWithAlbumAndArtists {
     duration_ms: u32,        // Duration of the track
     provider_urls: HashMap<ProviderId, Url>, // External Provider Music URLs
 
-    album: Album,             // Album which the track is part of
-    artists: HashSet<Artist>, // Artists present in the music
+    album: Album,         // Album which the track is part of
+    artists: Vec<Artist>, // Artists present in the music
 }
 
 impl TrackWithAlbumAndArtists {
@@ -62,7 +62,7 @@ impl TrackWithAlbumAndArtists {
         duration_ms: u32,
         provider_urls: HashMap<ProviderId, Url>,
         album: Album,
-        artists: HashSet<Artist>,
+        artists: Vec<Artist>,
     ) -> Self {
         Self {
             ids,
@@ -94,7 +94,7 @@ impl TrackWithAlbumAndArtists {
         &self.album
     }
 
-    pub fn artists(&self) -> &HashSet<Artist> {
+    pub fn artists(&self) -> &Vec<Artist> {
         &self.artists
     }
 }

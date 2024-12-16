@@ -4,6 +4,7 @@ use url::Url;
 
 use crate::value_objects::{image_cover::ImageCover, provider::provider_id::ProviderId};
 
+#[derive(PartialEq, Eq)]
 pub struct Artist {
     ids: HashMap<ProviderId, String>,
     name: String,
