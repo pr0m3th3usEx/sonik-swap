@@ -1,9 +1,10 @@
 use url::Url;
-use uuid::Uuid;
+
+use crate::value_objects::provider::provider_id::ProviderId;
 
 #[derive(Hash)]
 pub struct MusicAccountProvider {
-    id: Uuid,                           // Sonik Swap Provider ID
+    id: ProviderId,                     // Sonik Swap Provider ID
     name: String,                       // Name of the platform
     color: String,                      // # Hex decimal color
     base_url: Url,                      // OAuth2 Base URL
@@ -13,7 +14,7 @@ pub struct MusicAccountProvider {
 
 impl MusicAccountProvider {
     pub fn new(
-        id: Uuid,
+        id: ProviderId,
         name: String,
         color: String,
         base_url: Url,
@@ -30,8 +31,8 @@ impl MusicAccountProvider {
         }
     }
 
-    pub fn id(&self) -> Uuid {
-        self.id
+    pub fn id(&self) -> &ProviderId {
+        &self.id
     }
 
     pub fn name(&self) -> &String {

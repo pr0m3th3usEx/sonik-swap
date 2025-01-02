@@ -46,13 +46,13 @@ impl Track {
 }
 
 pub struct TrackWithAlbumAndArtists {
-    ids: HashSet<ProductId>, // Track ids from external databases & providers (ISRC, UPC, EAP, Provider IDs...)
-    name: String,            // Name of the track
-    duration_ms: u32,        // Duration of the track
-    provider_urls: HashMap<ProviderId, Url>, // External Provider Music URLs
+    pub ids: HashSet<ProductId>, // Track ids from external databases & providers (ISRC, UPC, EAP, Provider IDs...)
+    pub name: String,            // Name of the track
+    pub duration_ms: u32,        // Duration of the track
+    pub provider_urls: HashMap<ProviderId, Url>, // External Provider Music URLs
 
-    album: Album,         // Album which the track is part of
-    artists: Vec<Artist>, // Artists present in the music
+    pub album: Album,         // Album which the track is part of
+    pub artists: Vec<Artist>, // Artists present in the music
 }
 
 impl TrackWithAlbumAndArtists {
