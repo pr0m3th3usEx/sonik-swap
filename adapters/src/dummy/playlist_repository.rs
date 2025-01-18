@@ -26,7 +26,6 @@ impl PlaylistRepository for DummyPlaylistRepository {
             HashSet::new(),
             String::from("me"),
             5,
-            ProviderId::new(String::from("deezer")),
             "https://www.deezer.com/us/playlist/9701198282"
                 .parse()
                 .unwrap(),
@@ -40,7 +39,6 @@ impl PlaylistRepository for DummyPlaylistRepository {
             HashSet::new(),
             String::from("me"),
             5,
-            ProviderId::new(String::from("deezer")),
             "https://www.deezer.com/us/playlist/9701198282"
                 .parse()
                 .unwrap(),
@@ -54,7 +52,6 @@ impl PlaylistRepository for DummyPlaylistRepository {
             HashSet::new(),
             String::from("me"),
             5,
-            ProviderId::new(String::from("deezer")),
             "https://www.deezer.com/us/playlist/9701198282"
                 .parse()
                 .unwrap(),
@@ -68,7 +65,6 @@ impl PlaylistRepository for DummyPlaylistRepository {
             HashSet::new(),
             String::from("me"),
             5,
-            ProviderId::new(String::from("deezer")),
             "https://www.deezer.com/us/playlist/9701198282"
                 .parse()
                 .unwrap(),
