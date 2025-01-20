@@ -53,6 +53,10 @@ export default {
         },
         spotify: 'hsl(var(--spotify))',
         deezer: 'hsl(var(--deezer))',
+        teal: 'rgb(var(--teal))',
+
+        mainGradientStart: 'hsl(var(--main-gradient-start))',
+        mainGradientEnd: 'hsl(var(--main-gradient-end))',
       },
       borderRadius: {
         lg: 'var(--radius)',

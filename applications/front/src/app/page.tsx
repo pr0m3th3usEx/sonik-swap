@@ -7,6 +7,14 @@ import DeezerLogo from '@/lib/theme/assets/icons/deezer.svg';
 export default function Home() {
   return (
     <div className={cn('w-screen h-screen', 'flex flex-col gap-12')}>
+      <div
+        className="absolute inset-0 -z-10 flex justify-center"
+        style={{ top: '-282px' }}
+      >
+        <div className="bg-shape bg-mainGradientStart opacity-50 bg-blur translate-x-20"></div>
+        <div className="bg-shape bg-mainGradientEnd opacity-50 bg-blur -translate-x-20"></div>
+      </div>
+
       <header className={cn('flex justify-center', 'py-5')}>
         <div className="flex gap-3 items-center">
           <NextImage

@@ -44,6 +44,10 @@ body {
     
     --spotify: 141.41deg 75.51% 48.04%;
     --deezer: 271.96deg 100% 60.98%;
+    --teal: 14, 148, 130; 
+
+    --main-gradient-start: 301 58% 55%;
+    --main-gradient-end: 266 54% 48%;
 
     --radius: 0.5rem;
   }
@@ -91,4 +95,15 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.bg-shape {
+  z-index: -10;
+  width: 520px;
+  height: 520px;
+  border-radius: 9999px;
+}
+
+.bg-blur {
+  filter: blur(128px);
 }
