@@ -107,3 +107,36 @@ body {
 .bg-blur {
   filter: blur(128px);
 }
+
+.sidebar {
+  @apply w-24 h-full px-2 py-2 rounded-sm bg-accent relative;
+}
+
+@property --angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes border-spin {
+  0% {
+    --angle: 0deg;
+  }
+  100% {
+    --angle: 360deg;
+  }
+}
+
+.sidebar::after {
+  content: '';
+  position: absolute;
+  width: calc(100% + 7px);
+  height: calc(100% + 7px);
+  border-radius: 5px;
+  background-image: conic-gradient(from var(--angle), transparent 10%, hsl(var(--main-gradient-end)));
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  z-index: -1;
+  animation: 10s border-spin ease-in infinite;
+}
