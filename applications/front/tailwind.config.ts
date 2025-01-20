@@ -51,6 +51,8 @@ export default {
           '4': 'hsl(var(--chart-4))',
           '5': 'hsl(var(--chart-5))',
         },
+        spotify: 'hsl(var(--spotify))',
+        deezer: 'hsl(var(--deezer))',
       },
       borderRadius: {
         lg: 'var(--radius)',
