@@ -3,28 +3,15 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import SpotifyLogo from '@/lib/theme/assets/icons/spotify.svg';
 import DeezerLogo from '@/lib/theme/assets/icons/deezer.svg';
+import Background from '@/components/background';
+import Logo from '@/components/logo';
 
 export default function Home() {
   return (
     <div className={cn('w-screen h-screen', 'flex flex-col gap-12')}>
-      <div
-        className="absolute inset-0 -z-10 flex justify-center"
-        style={{ top: '-282px' }}
-      >
-        <div className="bg-shape bg-mainGradientStart opacity-50 bg-blur translate-x-20"></div>
-        <div className="bg-shape bg-mainGradientEnd opacity-50 bg-blur -translate-x-20"></div>
-      </div>
-
+      <Background />
       <header className={cn('flex justify-center', 'py-5')}>
-        <div className="flex gap-3 items-center">
-          <NextImage
-            src="logo/with_border.svg"
-            alt="Sonik Swap Logo"
-            width={48}
-            height={48}
-          />
-          <h1 className={cn('font-bold text-3xl')}>SonikSwap</h1>
-        </div>
+        <Logo size="lg" />
       </header>
       <main className="flex-grow flex flex-col justify-center items-center gap-12 px-14 uppercase">
         <h2 className={cn('text-center text-5xl')}>
