@@ -1,4 +1,3 @@
-import NextImage from 'next/image';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import SpotifyLogo from '@/lib/theme/assets/icons/spotify.svg';
@@ -14,7 +13,7 @@ export default function Home() {
         <Logo size="lg" />
       </header>
       <main className="flex-grow flex flex-col justify-center items-center gap-12 px-14 uppercase">
-        <h2 className={cn('text-center text-5xl')}>
+        <h2 className={cn('text-center text-5xl font-heading')}>
           Transfer your Spotify favourite tracks & playlists to Deezer and
           vice-versa
         </h2>

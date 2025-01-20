@@ -1,6 +1,7 @@
 import { ThemeProvider } from '@/components/providers/theme-provider';
 import './globals.css';
-import { intro } from '@/lib/theme/fonts';
+import { intro, poppins } from '@/lib/theme/fonts';
+import { cn } from '@/lib/utils';
 
 export default function RootLayout({
   children,
@@ -9,7 +10,11 @@ export default function RootLayout({
 }) {
   return (
     <>
-      <html lang="en" suppressHydrationWarning className={intro.className}>
+      <html
+        lang="en"
+        suppressHydrationWarning
+        className={cn(intro.variable, poppins.variable)}
+      >
         <head />
         <body>
           <ThemeProvider

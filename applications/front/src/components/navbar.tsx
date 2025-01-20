@@ -7,12 +7,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
+import Link from 'next/link';
 
 export default function Navbar() {
   return (
     <header className="flex justify-center px-4 py-4 h-24">
       <div className="flex justify-between items-center w-full py-4 px-4 rounded-sm bg-accent/80 shadow-md">
-        <Logo size="sm" />
+        <Link href="/">
+          <Logo size="sm" />
+        </Link>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

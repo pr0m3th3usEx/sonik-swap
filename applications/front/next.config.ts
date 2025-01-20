@@ -10,7 +10,6 @@ const nextConfig: NextConfig = {
 
     return config;
   },
-
   experimental: {
     turbo: {
       rules: {
@@ -23,6 +22,15 @@ const nextConfig: NextConfig = {
   },
   eslint: {
     dirs: ['src'],
+  },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'image-cdn-ak.spotifycdn.com',
+        port: '',
+      },
+    ],
   },
 };
 

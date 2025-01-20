@@ -25,13 +25,15 @@ export default function Logo({
   return (
     <div className="flex gap-3 items-center">
       <Image
-        src="logo/with_border.svg"
+        src="/logo/with_border.svg"
         alt="Sonik Swap Logo"
         className={style[size].icon}
         width={48}
         height={48}
       />
-      <h1 className={cn('font-bold', style[size].title)}>SonikSwap</h1>
+      <h1 className={cn('font-bold font-heading', style[size].title)}>
+        SonikSwap
+      </h1>
     </div>
   );
 }

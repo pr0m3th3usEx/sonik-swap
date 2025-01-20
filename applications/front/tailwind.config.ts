@@ -10,6 +10,10 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        heading: 'var(--heading-font)',
+        body: 'var(--body-font)',
+      },
       colors: {
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
@@ -62,6 +66,24 @@ export default {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
+      },
+      keyframes: {
+        fadeSlide: {
+          '0%': {
+            translate: '-70% 0%',
+            opacity: '0',
+          },
+          '50%': {
+            opacity: '0.2',
+          },
+          '100%': {
+            translate: '0% 0%',
+            opacity: '1',
+          },
+        },
+      },
+      animation: {
+        'fade-slide': 'fadeSlide 500ms ease-in-out forwards',
       },
     },
   },

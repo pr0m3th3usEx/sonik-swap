@@ -9,7 +9,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className={cn('w-screen h-screen', 'flex flex-col')}>
+    <div className={cn('w-screen h-screen max-h-screen', 'flex flex-col')}>
       <Background />
       <Navbar />
 
@@ -18,7 +18,7 @@ export default function DashboardLayout({
         <Sidebar />
 
         {/* Content */}
-        <div className="grow h-full">{children}</div>
+        <div className="grow h-full max-h-full">{children}</div>
       </div>
     </div>
   );
