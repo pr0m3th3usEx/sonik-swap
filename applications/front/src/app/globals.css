@@ -109,7 +109,7 @@ body {
 }
 
 .sidebar {
-  @apply w-24 h-full px-2 py-2 rounded-sm bg-accent relative;
+  @apply w-24 h-full px-3 py-3 rounded-sm bg-accent relative;
 }
 
 @property --angle {
@@ -127,7 +127,7 @@ body {
   }
 }
 
-.sidebar::after {
+.sidebar::before, .sidebar::after {
   content: '';
   position: absolute;
   width: calc(100% + 7px);
@@ -139,4 +139,8 @@ body {
   translate: -50% -50%;
   z-index: -1;
   animation: 10s border-spin ease-in infinite;
+}
+
+.sidebar::before {
+  filter: blur(12px);
 }

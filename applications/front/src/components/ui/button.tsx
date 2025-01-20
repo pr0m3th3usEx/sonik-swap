@@ -21,12 +21,14 @@ const buttonVariants = cva(
         link: 'text-primary underline-offset-4 hover:underline',
         spotify: 'text-primary-foregroud bg-spotify hover:bg-spotify/90',
         deezer: 'text-primary-foregroud bg-deezer hover:bg-deezer/90',
+        provider: 'flex justify-center items-center rounded-sm',
       },
       size: {
         default: 'h-9 px-4 py-4',
         sm: 'h-8 rounded-md px-3 text-xs',
         lg: 'h-12 rounded-sm px-8',
         icon: 'h-9 w-9',
+        provider: 'w-full aspect-square',
       },
     },
     defaultVariants: {
