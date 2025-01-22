@@ -1,8 +1,14 @@
+'use client';
+
 import Link from 'next/link';
 import { Button } from './ui/button';
 import AddIcon from '@/lib/theme/assets/icons/add.svg';
+import { useState } from 'react';
+import ConnectAccountModal from './modals/connect-account-modal';
 
 export default function Sidebar() {
+  const [open, setOpen] = useState(false);
+
   return (
     <div className="sidebar flex flex-col justify-between">
       <div className="flex flex-col gap-3">
@@ -31,9 +37,11 @@ export default function Sidebar() {
         variant="provider"
         size="provider"
         className="border border-primary hover:bg-primary/50"
+        onClick={() => setOpen(true)}
       >
         <AddIcon className="!w-5 !h-5" />
       </Button>
+      <ConnectAccountModal open={open} onOpenChange={setOpen} />
     </div>
   );
 }
