@@ -2,26 +2,18 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import {
-  getCoreRowModel,
-  useReactTable,
-  createColumnHelper,
-  flexRender,
-} from '@tanstack/react-table';
+import { createColumnHelper, ColumnDef } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { TableCell, TableHead } from '@/components/ui/table';
 import SpotifyIcon from '@/lib/theme/assets/icons/spotify.svg';
 import DeezerIcon from '@/lib/theme/assets/icons/deezer.svg';
-import React from 'react';
+import React, { useMemo, useState } from 'react';
+import { Checkbox } from '@/components/ui/checkbox';
+import DataTable from '@/components/data-table';
+import TrackSelectionProvider from '@/components/providers/track-selection-provider';
+import PlaylistManagerActionBar from '@/components/playlist-manager-actionbar';
 
-type Track = {
+export type Track = {
   ids: Record<string, string>;
   coverImg: string;
   title: string;
@@ -39,7 +31,26 @@ const providersIcon: Record<string, React.ReactNode> = {
 const columnHelper = createColumnHelper<Track>();
 
 export default function PlaylistManagerPage() {
-  const columns = [
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const columns: ColumnDef<Track, any>[] = [
+    columnHelper.display({
+      id: 'select',
+      header: () => <TableHead></TableHead>,
+      cell: ({ row }) => (
+        <TableCell>
+          <div>
+            <Checkbox
+              checked={row.getIsSelected()}
+              onCheckedChange={(value) => row.toggleSelected(!!value)}
+              arial-label="select row"
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            />
+          </div>
+        </TableCell>
+      ),
+    }),
     columnHelper.display({
       id: 'title',
       header: () => <TableHead className="w-[300px]">Title</TableHead>,
@@ -82,7 +93,7 @@ export default function PlaylistManagerPage() {
           <div className="flex justify-end gap-1">
             {Object.entries(props.getValue()).map(([provider, link]) => (
               <Button key={provider} variant="outline">
-                <Link target="_blank" href={link}>
+                <Link target="_blank" href={link as string}>
                   {providersIcon[provider]}
                 </Link>
               </Button>
@@ -93,79 +104,67 @@ export default function PlaylistManagerPage() {
     }),
   ];
 
-  const data: Track[] = [
-    {
-      ids: {
-        spotify: 'key1',
+  const data: Track[] = useMemo(
+    () => [
+      {
+        ids: {
+          spotify: 'key1',
+        },
+        coverImg:
+          'https://image-cdn-ak.spotifycdn.com/image/ab67706c0000d72c785808b8933da7bde038e8a4',
+        album: 'MUTT',
+        artist: 'Leon Thomas',
+        durationMs: 180000,
+        title: 'MUTT',
+        urls: {
+          spotify: 'https://www.spotify.com',
+          deezer: 'https://www.deezer.com',
+        },
       },
-      coverImg:
-        'https://image-cdn-ak.spotifycdn.com/image/ab67706c0000d72c785808b8933da7bde038e8a4',
-      album: 'MUTT',
-      artist: 'Leon Thomas',
-      durationMs: 180000,
-      title: 'MUTT',
-      urls: {
-        spotify: 'https://www.spotify.com',
-        deezer: 'https://www.deezer.com',
+      {
+        ids: {
+          spotify: 'key2',
+        },
+        coverImg:
+          'https://image-cdn-ak.spotifycdn.com/image/ab67706c0000d72c785808b8933da7bde038e8a4',
+        album: 'MUTT',
+        artist: 'Leon Thomas',
+        durationMs: 180000,
+        title: 'ANSWER THE PHONE',
+        urls: {
+          spotify: 'https://www.spotify.com',
+          deezer: 'https://www.deezer.com',
+        },
       },
-    },
-  ];
-
-  // TODO Put table in a child client component
-  // TODO Encapsulate state management into a provider
-
-  const tracksTable = useReactTable({
-    columns,
-    data,
-    getCoreRowModel: getCoreRowModel(),
-    getRowId: (track) => `${track.title} - ${track.artist} - ${track.album}`,
-  });
+      {
+        ids: {
+          spotify: 'key3',
+        },
+        coverImg:
+          'https://image-cdn-ak.spotifycdn.com/image/ab67706c0000d72c785808b8933da7bde038e8a4',
+        album: 'MUTT',
+        artist: 'Leon Thomas',
+        durationMs: 180000,
+        title: 'HOW FAST',
+        urls: {
+          spotify: 'https://www.spotify.com',
+          deezer: 'https://www.deezer.com',
+        },
+      },
+    ],
+    [],
+  );
 
   return (
-    <div className="flex flex-col gap-12 p-8">
-      <div className="flex flex-col gap-2">
-        <h2 className="font-heading text-3xl">Playlist : Test</h2>
-        <h3 className="text-primary/80">50 songs</h3>
+    <TrackSelectionProvider>
+      <div className="flex flex-col gap-12 p-8">
+        <div className="flex flex-col gap-2">
+          <h2 className="font-heading text-3xl">Playlist : Test</h2>
+          <h3 className="text-primary/80">50 songs</h3>
+        </div>
+        <PlaylistManagerActionBar />
+        <DataTable columns={columns} data={data} />
       </div>
-      {/* Action bar */}
-      <div className="flex gap-4 justify-start">
-        <Button>Transfer all tracks to ...</Button>
-      </div>
-
-      <Table>
-        <TableHeader>
-          {tracksTable.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <React.Fragment key={header.id}>
-                  {flexRender(
-                    header.column.columnDef.header,
-                    header.getContext(),
-                  )}
-                </React.Fragment>
-              ))}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {tracksTable.getRowModel().rows.map((row) => {
-            return (
-              <TableRow key={row.id}>
-                {row.getVisibleCells().map((cell) => {
-                  return (
-                    <React.Fragment key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </React.Fragment>
-                  );
-                })}
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-    </div>
+    </TrackSelectionProvider>
   );
 }

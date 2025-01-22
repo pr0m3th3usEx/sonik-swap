@@ -17,7 +17,7 @@ const eslintConfig = [
       'next/typescript',
       'plugin:prettier/recommended',
     ],
-  }),
+  })
 ];
 
 export default eslintConfig;

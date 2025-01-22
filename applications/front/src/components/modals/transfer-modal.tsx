@@ -1,3 +1,5 @@
+import { Track } from '@/app/dashboard/[provider]/[playlistId]/page';
+import { useTrackSelection } from '../providers/track-selection-provider';
 import {
   Dialog,
   DialogContent,
@@ -13,6 +15,9 @@ export default function TransferModal({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
+  // const { dataSelected: tracksSelected, nbRowsSelected } =
+  //   useTrackSelection() as { dataSelected: Track[]; nbRowsSelected: number };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="gap-6">
