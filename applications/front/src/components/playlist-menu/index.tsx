@@ -1,7 +1,7 @@
 import PlaylistMenuAction from './playlist-menu-action';
-import PlaylistMenuItem from './playlist-menu-item';
+import PlaylistMenuClient from './client';
 
-type Playlist = {
+export type Playlist = {
   id: string;
   name: string;
   nbSongs: number;
@@ -44,17 +44,7 @@ export default async function PlaylistMenu({ provider }: { provider: string }) {
         <PlaylistMenuAction provider={provider} />
       </div>
 
-      <div className="grow flex basis-0 flex-col max-h-full overflow-auto gap-3 cursor-pointer">
-        {playlists.map((playlist) => (
-          <PlaylistMenuItem
-            key={playlist.id}
-            playlistId={playlist.id}
-            name={playlist.name}
-            cover={playlist.cover}
-            nbSongs={playlist.nbSongs}
-          />
-        ))}
-      </div>
+      <PlaylistMenuClient provider={provider} playlists={playlists} />
     </div>
   );
 }

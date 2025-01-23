@@ -12,7 +12,12 @@ export type Track = {
   urls: Record<string, string>;
 };
 
-export default async function PlaylistManagerPage() {
+export default async function PlaylistManagerPage({
+  params,
+}: {
+  params: Promise<{ provider: string; playlistId: string }>;
+}) {
+  const { provider, playlistId } = await params;
   const data = await new Promise<Track[]>((resolve) =>
     setTimeout(
       () =>
@@ -74,7 +79,7 @@ export default async function PlaylistManagerPage() {
           <h2 className="font-heading text-3xl">Playlist : Test</h2>
           <h3 className="text-primary/80">50 songs</h3>
         </div>
-        <PlaylistManagerActionBar />
+        <PlaylistManagerActionBar {...{ provider, playlistId }} />
         <PlaylistManagerTracksSelector />
       </div>
     </TrackSelectionProvider>

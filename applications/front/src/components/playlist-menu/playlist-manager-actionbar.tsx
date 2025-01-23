@@ -9,18 +9,25 @@ import {
   useTrackSelection,
 } from '../providers/track-selection-provider';
 
-export default function PlaylistManagerActionBar() {
+export default function PlaylistManagerActionBar({
+  provider,
+  playlistId,
+}: {
+  provider: string;
+  playlistId: string;
+}) {
   const [open, setOpen] = useState(false);
 
-  const {
-    dataSelected: tracksSelected,
-    nbRowsSelected: nbTracksSelected,
-    setRowSelection,
-  } = useTrackSelection() as TrackSelectionContextProps<Track>;
+  const { nbRowsSelected: nbTracksSelected, setRowSelection } =
+    useTrackSelection() as TrackSelectionContextProps<Track>;
 
   return (
     <div className="flex gap-4 justify-start">
-      <TransferModal open={open} onOpenChange={setOpen} />
+      <TransferModal
+        open={open}
+        onOpenChange={setOpen}
+        {...{ provider, playlistId }}
+      />
 
       {nbTracksSelected === 0 ? (
         <Button onClick={() => setOpen(true)}>
