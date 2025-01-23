@@ -9,7 +9,8 @@ export interface TrackSelectionContextProps<TData> {
   setDataSelected: (value: SetStateAction<TData[]>) => void;
   nbRowsSelected: number;
   dataSelected: TData[];
-};
+  data: TData[];
+}
 
 const defaultValue: TrackSelectionContextProps<any> = {
   rowSelection: {},
@@ -19,6 +20,7 @@ const defaultValue: TrackSelectionContextProps<any> = {
   setDataSelected: (_) => {},
   nbRowsSelected: 0,
   dataSelected: [],
+  data: [],
 };
 
 const TrackSelectionContext =
@@ -28,8 +30,10 @@ export const useTrackSelection = () => useContext(TrackSelectionContext);
 
 export default function TrackSelectionProvider<TData>({
   children,
+  data,
 }: {
   children: React.ReactNode;
+  data: TData[];
 }) {
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
   const [dataSelected, setDataSelected] = useState<TData[]>([]);
@@ -43,6 +47,7 @@ export default function TrackSelectionProvider<TData>({
         nbRowsSelected,
         setDataSelected,
         dataSelected,
+        data,
       }}
     >
       {children}

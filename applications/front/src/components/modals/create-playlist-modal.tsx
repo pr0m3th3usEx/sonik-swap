@@ -35,7 +35,7 @@ export default function CreatePlaylistModal({
             </div>
           </form>
         </div>
-        <DialogFooter className="sm:justify-start">
+        <DialogFooter className="sm:justify-end">
           <DialogClose asChild>
             <Button type="button" variant="secondary">
               Cancel

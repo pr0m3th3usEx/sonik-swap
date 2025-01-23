@@ -1,13 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import TransferModal from './modals/transfer-modal';
-import { Button } from './ui/button';
+import TransferModal from '../modals/transfer-modal';
+import { Button } from '../ui/button';
 import { Track } from '@/app/dashboard/[provider]/[playlistId]/page';
 import {
   TrackSelectionContextProps,
   useTrackSelection,
-} from './providers/track-selection-provider';
+} from '../providers/track-selection-provider';
 
 export default function PlaylistManagerActionBar() {
   const [open, setOpen] = useState(false);

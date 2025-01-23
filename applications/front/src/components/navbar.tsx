@@ -26,6 +26,7 @@ export default function Navbar() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56">
+            <DropdownMenuItem>My account</DropdownMenuItem>
             <DropdownMenuItem>Log out</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

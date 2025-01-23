@@ -4,9 +4,12 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '../ui/dialog';
+import PlaylistMenuItem from '../playlist-menu/playlist-menu-item';
+import { Button } from '../ui/button';
 
 export default function TransferModal({
   open,
@@ -22,13 +25,31 @@ export default function TransferModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="gap-6">
         <DialogHeader>
-          <DialogTitle>Add music accounts</DialogTitle>
+          <DialogTitle>Transfers tracks</DialogTitle>
           <DialogDescription>
-            Link your music accounts and start transfering your favourite
-            playlists & tracks
+            Where do you want to transfer the tracks of your playlist ?
           </DialogDescription>
         </DialogHeader>
-        <div className="grid grid-cols-4 flex-col gap-4"></div>
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3">
+            <h3>Spotify</h3>
+
+            <PlaylistMenuItem />
+            <PlaylistMenuItem />
+            <PlaylistMenuItem />
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <h3>Deezer</h3>
+
+            <PlaylistMenuItem />
+            <PlaylistMenuItem />
+            <PlaylistMenuItem />
+          </div>
+        </div>
+        <DialogFooter className="sm:justify-end">
+          <Button>Transfer tracks</Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
