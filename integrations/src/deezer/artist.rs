@@ -37,5 +37,22 @@ pub struct DeezerArtist {
     pub nb_album: u32,
     pub nb_fan: u32,
     pub radio: bool,
-    // pub tracklist: Url,
+    pub tracklist: Option<Url>,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{DeezerIdType, DeezerArtist};
+
+    #[test]
+    pub fn test_deserialize_artist() {
+        let json_str = include_str!("../../tests/payloads/test_artist.json");
+        let json = serde_json::from_str::<DeezerArtist>(&json_str).expect("valid json");
+
+        assert_eq!(json.name, "NewJeans");
+        assert_eq!(
+            json.id,
+            DeezerIdType::IdString("178008437".to_string())
+        );
+    }
 }
