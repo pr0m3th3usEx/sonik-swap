@@ -32,9 +32,6 @@ pub struct DeezerPlaylist {
     pub collaborative: bool,
     // Nb tracks in the playlist
     pub nb_tracks: u32,
-    // Nb tracks not seen
-    #[allow(dead_code)]
-    pub unseen_track_count: u32,
     // The number of playlist's fans
     #[allow(dead_code)]
     pub fans: u32,
@@ -81,5 +78,19 @@ impl Into<Playlist> for DeezerPlaylist {
         }
 
         Playlist::new(id, name, covers, owner, total_songs, provider_url)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::deezer::playlist::DeezerPlaylist;
+
+    #[test]
+    pub fn test_deserialize_playlist() {
+        let json_str = include_str!("../../tests/payloads/test_playlist.json");
+        let json = serde_json::from_str::<DeezerPlaylist>(&json_str).expect("valid json");
+
+        assert_eq!(json.title, "Women of Rap");
+        assert_eq!(json.nb_tracks, 50);
     }
 }
