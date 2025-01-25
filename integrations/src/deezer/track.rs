@@ -1,6 +1,6 @@
 use std::collections::{HashMap, HashSet};
 
-use chrono::{DateTime, NaiveDateTime, Utc};
+use chrono::NaiveDateTime;
 use serde::Deserialize;
 use snk_core::{
     entities::{album::Album, artist::Artist, track::TrackWithAlbumAndArtists},
@@ -24,8 +24,6 @@ pub struct DeezerTrack {
     pub title_short: String,
     // The track version
     pub title_version: String,
-    // The track unseen status
-    pub unseen: bool,
     // The track isrc
     pub isrc: String,
     // The url of the track on Deezer
@@ -33,15 +31,15 @@ pub struct DeezerTrack {
     // The share link of the track on Deezer
     pub share: Url,
     // The track's duration in seconds
-    pub duration: u32,
+    pub duration: String,
     // The position of the track in its album
     pub track_position: u32,
     // The track's album's disk number
     pub disk_number: u32,
     // The track's Deezer rank
-    pub rank: u32,
+    pub rank: String,
     // The track's release date
-    pub release_date: DateTime<Utc>,
+    pub release_date: String,
     // Whether the track contains explicit lyrics
     pub explicit_lyrics: bool,
     // The explicit content lyrics values (0:Not Explicit; 1:Explicit; 2:Unknown; 3:Edited; 6:No Advice Available)
@@ -79,6 +77,10 @@ impl TryInto<TrackWithAlbumAndArtists> for DeezerTrack {
             self.id,
         )));
 
+        let Ok(duration) = self.duration.parse::<u32>() else {
+            return Err("duration is corrupted");
+        };
+
         let mut urls = HashMap::new();
 
         urls.insert(ProviderId::new("deezer".to_string()), self.link);
@@ -89,7 +91,7 @@ impl TryInto<TrackWithAlbumAndArtists> for DeezerTrack {
         Ok(TrackWithAlbumAndArtists::new(
             ids,
             self.title,
-            self.duration * 1000,
+            duration * 1000,
             urls,
             album,
             artists,
@@ -230,4 +232,19 @@ fn get_artists(reduced_artists: Vec<ReducedArtist>) -> Result<Vec<Artist>, &'sta
             Ok(Artist::new(ids, name, pictures, urls))
         })
         .collect::<Result<_, _>>()
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::deezer::track::DeezerTrack;
+
+    #[test]
+    pub fn test_deserialize_playlist() {
+        let json_str = include_str!("../../tests/payloads/test_track.json");
+        let json = serde_json::from_str::<DeezerTrack>(&json_str).expect("valid json");
+
+        assert_eq!(json.title, "How Sweet");
+        assert_eq!(json.artist.name, Some("NewJeans".to_string()));
+        assert_eq!(json.album.title, Some("How Sweet".to_string()));
+    }
 }
