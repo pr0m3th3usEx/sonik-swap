@@ -1,6 +1,6 @@
 use std::collections::{HashMap, HashSet};
 
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, NaiveDateTime, Utc};
 use serde::Deserialize;
 use snk_core::{
     entities::{album::Album, artist::Artist, track::TrackWithAlbumAndArtists},
@@ -151,6 +151,10 @@ fn get_album(reduced_album: ReducedAlbum) -> Result<Album, &'static str> {
     let Some(album_release_date) = reduced_album.release_date else {
         return Err("album.release_date is missing");
     };
+    let Ok(album_release_date) = NaiveDateTime::parse_from_str(&album_release_date, "%Y-%m-%d")
+    else {
+        return Err("album.release_date is corrupted");
+    };
 
     let Some(album_link) = reduced_album.link else {
         return Err("album.link is missing");
@@ -163,7 +167,7 @@ fn get_album(reduced_album: ReducedAlbum) -> Result<Album, &'static str> {
     let album = Album::new(
         album_ids,
         album_title,
-        album_release_date,
+        album_release_date.and_utc(),
         album_covers,
         album_urls,
     );
@@ -181,7 +185,7 @@ fn get_artists(reduced_artists: Vec<ReducedArtist>) -> Result<Vec<Artist>, &'sta
                 return Err("artist.id is missing");
             };
 
-            ids.insert(ProviderId::new("deezer".to_string()), id);
+            ids.insert(ProviderId::new("deezer".to_string()), id.to_string());
 
             let Some(name) = reduced.name else {
                 return Err("artist.name is missing");

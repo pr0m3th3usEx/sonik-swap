@@ -6,7 +6,7 @@ use serde::Deserialize;
 pub enum DeezerErrorType {
     Quota,
     ItemsLimitExceeded,
-    PERMISSION,
+    Permission,
     TokenInvalid,
     Parameter,
     ParameterMissing,
@@ -46,7 +46,7 @@ impl TryFrom<DeezerError> for DeezerErrorType {
             match code {
                 4 => Ok(DeezerErrorType::Quota),
                 100 => Ok(DeezerErrorType::ItemsLimitExceeded),
-                200 => Ok(DeezerErrorType::PERMISSION),
+                200 => Ok(DeezerErrorType::Permission),
                 300 => Ok(DeezerErrorType::TokenInvalid),
                 400 => Ok(DeezerErrorType::Parameter),
                 500 => Ok(DeezerErrorType::ParameterMissing),
@@ -60,7 +60,7 @@ impl TryFrom<DeezerError> for DeezerErrorType {
             match error.error_type.as_str() {
                 "Exception" => Ok(DeezerErrorType::Quota),
                 // "Exception" => Ok(DeezerErrorType::ItemsLimitExceeded),
-                "OAuthException" => Ok(DeezerErrorType::PERMISSION),
+                "OAuthException" => Ok(DeezerErrorType::Permission),
                 // "OAuthException" => Ok(DeezerErrorType::TokenInvalid),
                 "ParameterException" => Ok(DeezerErrorType::Parameter),
                 "MissingParameterException" => Ok(DeezerErrorType::ParameterMissing),

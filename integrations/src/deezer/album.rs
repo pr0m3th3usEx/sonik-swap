@@ -1,4 +1,3 @@
-use chrono::{DateTime, Utc};
 use partially::Partial;
 use serde::Deserialize;
 use url::Url;
@@ -38,7 +37,7 @@ pub struct DeezerAlbum {
     // List of genre object
     // TODO Genre object (not covered)
     #[partially(omit)]
-    pub genres: Vec<serde_json::Value>,
+    pub genres: serde_json::Value,
     // The album's label name
     #[partially(omit)]
     pub label: String,
@@ -51,7 +50,7 @@ pub struct DeezerAlbum {
     #[partially(omit)]
     pub fans: u32,
     // The album's release date
-    pub release_date: DateTime<Utc>,
+    pub release_date: String,
     // The record type of the album (EP / ALBUM / etc..)
     #[partially(omit)]
     pub record_type: String,
@@ -78,4 +77,24 @@ pub struct DeezerAlbum {
     // artist object containing : id, name, picture, picture_small, picture_medium, picture_big, picture_xl
     #[partially(omit)]
     pub artist: ReducedArtist,
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::deezer::artist::DeezerIdType;
+
+    use super::DeezerAlbum;
+
+    #[test]
+    pub fn test_deserialize_album() {
+        let json_str = include_str!("../../tests/payloads/test_album.json");
+        let json = serde_json::from_str::<DeezerAlbum>(&json_str).expect("valid json");
+
+        assert_eq!(json.title, "How Sweet");
+        assert_eq!(json.upc, "196922889738");
+        assert_eq!(
+            json.artist.id,
+            Some(DeezerIdType::IdString("178008437".to_string()))
+        );
+    }
 }
