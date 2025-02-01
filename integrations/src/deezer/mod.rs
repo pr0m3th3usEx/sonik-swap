@@ -73,7 +73,7 @@ impl<'a> DeezerPlaylistRepository<'a> {
 
         Ok(Self {
             http_client: Client::builder()
-                .connect_timeout(Duration::from_secs(5)) // TODO Define const
+                .connect_timeout(Duration::from_secs(5))
                 .default_headers(default_headers)
                 .build()
                 .map_err(|err| {
@@ -90,7 +90,7 @@ impl<'a> PlaylistRepository for DeezerPlaylistRepository<'a> {
         let response = self
             .http_client
             .get(match id {
-                PlaylistId::LikedSongs => "https://api.deezer.com/user/me/tracks".to_string(),
+                PlaylistId::LikedSongs => format!("{}/user/me/tracks", API_URL),
                 PlaylistId::Owned(deezer_id) => format!("{}/playlist/{}", API_URL, deezer_id),
             })
             .send()
@@ -252,7 +252,9 @@ impl<'a> PlaylistRepository for DeezerPlaylistRepository<'a> {
                                     deezer_error_payload.error.message,
                                 ))
                             }
-                            DeezerResponse::Playlist(deezer_playlist) => Ok((*deezer_playlist).into()),
+                            DeezerResponse::Playlist(deezer_playlist) => {
+                                Ok((*deezer_playlist).into())
+                            }
                             _ => Err(PlaylistRepositoryError::ServiceError(
                                 "bad response format".to_string(),
                             )),
@@ -276,41 +278,50 @@ impl<'a> PlaylistRepository for DeezerPlaylistRepository<'a> {
 
         data.insert("songs", ids.join(","));
 
-        match playlist_id {
-            PlaylistId::LikedSongs => {
-                todo!()
-            }
-            PlaylistId::Owned(deezer_id) => {
-                let response = self
-                    .http_client
-                    .post(format!("{}/playlist/{}/tracks", API_URL, deezer_id))
-                    .json(&data)
-                    .send()
-                    .await
-                    .map_err(|err| PlaylistRepositoryError::ServiceError(err.to_string()))?;
-
-                match response.status() {
-                    StatusCode::OK => {
-                        let response_body =
-                            response.json::<DeezerResponse>().await.map_err(|err| {
-                                PlaylistRepositoryError::ServiceError(err.to_string())
-                            })?;
-
-                        match response_body {
-                            DeezerResponse::Error(deezer_error_payload) => {
-                                Err(PlaylistRepositoryError::ServiceError(
-                                    deezer_error_payload.error.message,
-                                ))
-                            }
-                            _ => Ok(()),
-                        }
-                    }
-                    other => Err(PlaylistRepositoryError::ServiceError(format!(
-                        "Failed request: {}",
-                        other
-                    ))),
+        let url = reqwest::Url::parse_with_params(
+            match playlist_id {
+                PlaylistId::LikedSongs => format!("{}/user/me/tracks", API_URL),
+                PlaylistId::Owned(deezer_id) => {
+                    format!("{}/playlist/{}/tracks", API_URL, deezer_id)
                 }
             }
+            .as_str(),
+            data,
+        )
+        .map_err(|err| {
+            PlaylistRepositoryError::ServiceError(format!(
+                "add_tracks: invalid url ({})",
+                err
+            ))
+        })?;
+
+        let response = self
+            .http_client
+            .post(url)
+            .send()
+            .await
+            .map_err(|err| PlaylistRepositoryError::ServiceError(err.to_string()))?;
+
+        match response.status() {
+            StatusCode::OK => {
+                let response_body =
+                    response.json::<DeezerResponse>().await.map_err(|err| {
+                        PlaylistRepositoryError::ServiceError(err.to_string())
+                    })?;
+
+                match response_body {
+                    DeezerResponse::Error(deezer_error_payload) => {
+                        Err(PlaylistRepositoryError::ServiceError(
+                            deezer_error_payload.error.message,
+                        ))
+                    }
+                    _ => Ok(()),
+                }
+            }
+            other => Err(PlaylistRepositoryError::ServiceError(format!(
+                "Failed request: {}",
+                other
+            ))),
         }
     }
 
@@ -382,5 +393,24 @@ impl<'a> PlaylistRepository for DeezerPlaylistRepository<'a> {
                 other
             ))),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::collections::HashMap;
+    use crate::deezer::API_URL;
+
+    #[test]
+    pub fn test_url_with_params() {
+        let data: HashMap<&'static str, &'static str> = HashMap::from_iter([("songs", "1,2")]);
+        let result = reqwest::Url::parse_with_params(format!("{}/playlist/{}/tracks", API_URL, "10000000").as_str(),
+            data,
+        );
+
+        assert!(result.is_ok());
+        
+        let url = result.unwrap();
+        assert_eq!(url.to_string(), format!("{}/playlist/{}/tracks?songs=1%2C2", API_URL, "10000000").as_str())
     }
 }
