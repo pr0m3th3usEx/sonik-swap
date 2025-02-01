@@ -47,6 +47,7 @@ enum DeezerResponse {
     Playlist(Box<DeezerPlaylist>),
     ListPlaylists(DeezerList<DeezerPlaylist>),
     ListTracks(DeezerList<DeezerTrack>),
+    ActionResult(()),
 }
 
 pub struct DeezerPlaylistRepository<'a> {
@@ -289,10 +290,7 @@ impl<'a> PlaylistRepository for DeezerPlaylistRepository<'a> {
             data,
         )
         .map_err(|err| {
-            PlaylistRepositoryError::ServiceError(format!(
-                "add_tracks: invalid url ({})",
-                err
-            ))
+            PlaylistRepositoryError::ServiceError(format!("add_tracks: invalid url ({})", err))
         })?;
 
         let response = self
@@ -304,17 +302,15 @@ impl<'a> PlaylistRepository for DeezerPlaylistRepository<'a> {
 
         match response.status() {
             StatusCode::OK => {
-                let response_body =
-                    response.json::<DeezerResponse>().await.map_err(|err| {
-                        PlaylistRepositoryError::ServiceError(err.to_string())
-                    })?;
+                let response_body = response
+                    .json::<DeezerResponse>()
+                    .await
+                    .map_err(|err| PlaylistRepositoryError::ServiceError(err.to_string()))?;
 
                 match response_body {
-                    DeezerResponse::Error(deezer_error_payload) => {
-                        Err(PlaylistRepositoryError::ServiceError(
-                            deezer_error_payload.error.message,
-                        ))
-                    }
+                    DeezerResponse::Error(deezer_error_payload) => Err(
+                        PlaylistRepositoryError::ServiceError(deezer_error_payload.error.message),
+                    ),
                     _ => Ok(()),
                 }
             }
@@ -331,16 +327,47 @@ impl<'a> PlaylistRepository for DeezerPlaylistRepository<'a> {
         ids: &[String],
     ) -> PlaylistRepositoryResult<()> {
         let mut data = HashMap::new();
-
         data.insert("songs", ids.join(","));
 
-        match playlist_id {
-            PlaylistId::LikedSongs => {
-                todo!()
+        let url = reqwest::Url::parse_with_params(
+            match playlist_id {
+                PlaylistId::LikedSongs => format!("{}/user/me/tracks", API_URL),
+                PlaylistId::Owned(deezer_id) => {
+                    format!("{}/playlist/{}/tracks", API_URL, deezer_id)
+                }
             }
-            PlaylistId::Owned(_) => {
-                todo!()
+            .as_str(),
+            data,
+        )
+        .map_err(|err| {
+            PlaylistRepositoryError::ServiceError(format!("add_tracks: invalid url ({})", err))
+        })?;
+
+        let response = self
+            .http_client
+            .delete(url)
+            .send()
+            .await
+            .map_err(|err| PlaylistRepositoryError::ServiceError(err.to_string()))?;
+
+        match response.status() {
+            StatusCode::OK => {
+                let response_body = response
+                    .json::<DeezerResponse>()
+                    .await
+                    .map_err(|err| PlaylistRepositoryError::ServiceError(err.to_string()))?;
+
+                match response_body {
+                    DeezerResponse::Error(deezer_error_payload) => Err(
+                        PlaylistRepositoryError::ServiceError(deezer_error_payload.error.message),
+                    ),
+                    _ => Ok(()),
+                }
             }
+            other => Err(PlaylistRepositoryError::ServiceError(format!(
+                "Failed request: {}",
+                other
+            ))),
         }
     }
 
@@ -398,19 +425,23 @@ impl<'a> PlaylistRepository for DeezerPlaylistRepository<'a> {
 
 #[cfg(test)]
 mod tests {
-    use std::collections::HashMap;
     use crate::deezer::API_URL;
+    use std::collections::HashMap;
 
     #[test]
     pub fn test_url_with_params() {
         let data: HashMap<&'static str, &'static str> = HashMap::from_iter([("songs", "1,2")]);
-        let result = reqwest::Url::parse_with_params(format!("{}/playlist/{}/tracks", API_URL, "10000000").as_str(),
+        let result = reqwest::Url::parse_with_params(
+            format!("{}/playlist/{}/tracks", API_URL, "10000000").as_str(),
             data,
         );
 
         assert!(result.is_ok());
-        
+
         let url = result.unwrap();
-        assert_eq!(url.to_string(), format!("{}/playlist/{}/tracks?songs=1%2C2", API_URL, "10000000").as_str())
+        assert_eq!(
+            url.to_string(),
+            format!("{}/playlist/{}/tracks?songs=1%2C2", API_URL, "10000000").as_str()
+        )
     }
 }
