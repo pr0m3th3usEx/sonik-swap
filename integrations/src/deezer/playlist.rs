@@ -52,28 +52,28 @@ pub struct DeezerPlaylist {
     pub creator: ReducedArtist,
 }
 
-impl Into<Playlist> for DeezerPlaylist {
-    fn into(self) -> Playlist {
-        let id = PlaylistId::Owned(self.id);
-        let name = self.title;
-        let owner = self.creator.name.expect("missing creator name");
-        let total_songs = self.nb_tracks;
-        let provider_url = self.link;
+impl From<DeezerPlaylist> for Playlist {
+    fn from(val: DeezerPlaylist) -> Playlist {
+        let id = PlaylistId::Owned(val.id);
+        let name = val.title;
+        let owner = val.creator.name.expect("missing creator name");
+        let total_songs = val.nb_tracks;
+        let provider_url = val.link;
 
         let mut covers = HashSet::new();
 
-        covers.insert(ImageCover::Default(self.picture));
+        covers.insert(ImageCover::Default(val.picture));
 
-        if let Some(picture_small) = self.picture_small {
+        if let Some(picture_small) = val.picture_small {
             covers.insert(ImageCover::Sm(picture_small));
         }
-        if let Some(picture_medium) = self.picture_medium {
+        if let Some(picture_medium) = val.picture_medium {
             covers.insert(ImageCover::Md(picture_medium));
         }
-        if let Some(picture_big) = self.picture_big {
+        if let Some(picture_big) = val.picture_big {
             covers.insert(ImageCover::Lg(picture_big));
         }
-        if let Some(picture_xl) = self.picture_xl {
+        if let Some(picture_xl) = val.picture_xl {
             covers.insert(ImageCover::Lg(picture_xl));
         }
 

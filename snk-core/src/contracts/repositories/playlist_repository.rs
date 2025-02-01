@@ -20,7 +20,7 @@ pub trait PlaylistRepository {
 
     async fn get_all(&self) -> PlaylistRepositoryResult<Vec<Playlist>>;
 
-    async fn create(&self, name: &String) -> PlaylistRepositoryResult<Playlist>;
+    async fn create(&self, name: &str) -> PlaylistRepositoryResult<Playlist>;
 
     async fn delete(&self, id: &PlaylistId) -> PlaylistRepositoryResult<Playlist>;
 
@@ -29,13 +29,13 @@ pub trait PlaylistRepository {
     async fn add_tracks(
         &self,
         playlist_id: &PlaylistId,
-        ids: &Vec<String>,
+        ids: &[String],
     ) -> PlaylistRepositoryResult<()>;
 
     async fn delete_tracks(
         &self,
         playlist_id: &PlaylistId,
-        ids: &Vec<String>,
+        ids: &[String],
     ) -> PlaylistRepositoryResult<()>;
 
     async fn get_tracks(

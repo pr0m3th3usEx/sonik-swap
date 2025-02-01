@@ -14,7 +14,7 @@ impl ProductId {
             ProductId::ISRC(id) => id,
             ProductId::UPC(id) => id,
             ProductId::EAN(id) => id,
-            ProductId::Provider((_, id)) => &id,
+            ProductId::Provider((_, id)) => id,
         }
     }
 }

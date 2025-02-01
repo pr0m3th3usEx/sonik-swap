@@ -45,10 +45,10 @@ impl PlaylistRepository for DummyPlaylistRepository {
         )])
     }
 
-    async fn create(&self, name: &String) -> PlaylistRepositoryResult<Playlist> {
+    async fn create(&self, name: &str) -> PlaylistRepositoryResult<Playlist> {
         Ok(Playlist::new(
             PlaylistId::Owned(String::from("deezer_playlist_id")),
-            name.clone(),
+            name.to_string(),
             HashSet::new(),
             String::from("me"),
             5,
@@ -74,7 +74,7 @@ impl PlaylistRepository for DummyPlaylistRepository {
     async fn add_tracks(
         &self,
         _playlist_id: &PlaylistId,
-        _ids: &Vec<String>,
+        _ids:&[String],
     ) -> PlaylistRepositoryResult<()> {
         Ok(())
     }
@@ -82,7 +82,7 @@ impl PlaylistRepository for DummyPlaylistRepository {
     async fn delete_tracks(
         &self,
         _playlist_id: &PlaylistId,
-        _ids: &Vec<String>,
+        _ids: &[String],
     ) -> PlaylistRepositoryResult<()> {
         Ok(())
     }

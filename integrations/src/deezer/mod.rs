@@ -31,7 +31,7 @@ use snk_core::{
 use track::DeezerTrack;
 use url::Url;
 
-static API_URL: &'static str = "https://api.deezer.com";
+static API_URL: &str = "https://api.deezer.com";
 
 #[derive(Debug, Deserialize)]
 pub struct DeezerList<T> {
@@ -44,7 +44,7 @@ pub struct DeezerList<T> {
 #[serde(untagged)]
 enum DeezerResponse {
     Error(DeezerErrorPayload),
-    Playlist(DeezerPlaylist),
+    Playlist(Box<DeezerPlaylist>),
     ListPlaylists(DeezerList<DeezerPlaylist>),
     ListTracks(DeezerList<DeezerTrack>),
 }
@@ -87,63 +87,69 @@ impl<'a> DeezerPlaylistRepository<'a> {
 
 impl<'a> PlaylistRepository for DeezerPlaylistRepository<'a> {
     async fn get(&self, id: &PlaylistId) -> PlaylistRepositoryResult<Option<Playlist>> {
-        match id {
-            PlaylistId::LikedSongs => Ok(Some(Playlist::new(
-                id.clone(),
-                "Liked songs".to_string(),
-                HashSet::from_iter([ImageCover::Other(
-                    Url::from_str(
-                        "https://cdn.icon-icons.com/icons2/72/PNG/256/favourite_14390.png",
-                    )
-                    .map_err(|err| PlaylistRepositoryError::ServiceError(err.to_string()))?,
-                )]),
-                "me".to_string(),
-                0, // TODO Get this information
-                Url::from_str("https://www.deezer.com/us/profile/me/loved")
-                    .map_err(|err| PlaylistRepositoryError::ServiceError(err.to_string()))?, // TODO Add user id
-            ))),
-            PlaylistId::Owned(deezer_id) => {
-                let response = self
-                    .http_client
-                    .get(format!("{}/playlist/{}", API_URL, deezer_id))
-                    .send()
+        let response = self
+            .http_client
+            .get(match id {
+                PlaylistId::LikedSongs => "https://api.deezer.com/user/me/tracks".to_string(),
+                PlaylistId::Owned(deezer_id) => format!("{}/playlist/{}", API_URL, deezer_id),
+            })
+            .send()
+            .await
+            .map_err(|err| PlaylistRepositoryError::ServiceError(err.to_string()))?;
+
+        match response.status() {
+            StatusCode::OK => {
+                let response_body = response
+                    .json::<DeezerResponse>()
                     .await
                     .map_err(|err| PlaylistRepositoryError::ServiceError(err.to_string()))?;
 
-                match response.status() {
-                    StatusCode::OK => {
-                        let response_body =
-                            response.json::<DeezerResponse>().await.map_err(|err| {
-                                PlaylistRepositoryError::ServiceError(err.to_string())
-                            })?;
-                        match response_body {
-                            DeezerResponse::Error(deezer_error) => {
-                                let deezer_error = DeezerErrorType::try_from(deezer_error.error)
-                                    .map_err(|err: &str| {
-                                        PlaylistRepositoryError::ServiceError(err.to_string())
-                                    })?;
+                match (id, response_body) {
+                    /* Error handler */
+                    (PlaylistId::LikedSongs, DeezerResponse::Error(deezer_error))
+                    | (PlaylistId::Owned(_), DeezerResponse::Error(deezer_error)) => {
+                        let deezer_error = DeezerErrorType::try_from(deezer_error.error).map_err(
+                            |err: &str| PlaylistRepositoryError::ServiceError(err.to_string()),
+                        )?;
 
-                                match deezer_error {
-                                    DeezerErrorType::DataNotFound => Ok(None),
-                                    other_error => Err(PlaylistRepositoryError::ServiceError(
-                                        other_error.to_string(),
-                                    )),
-                                }
-                            }
-                            DeezerResponse::Playlist(deezer_playlist) => {
-                                Ok(Some(deezer_playlist.into()))
-                            }
-                            _ => Err(PlaylistRepositoryError::ServiceError(
-                                "bad response format".to_string(),
+                        match deezer_error {
+                            DeezerErrorType::DataNotFound => Ok(None),
+                            other_error => Err(PlaylistRepositoryError::ServiceError(
+                                other_error.to_string(),
                             )),
                         }
                     }
-                    other => Err(PlaylistRepositoryError::ServiceError(format!(
-                        "Failed request: {}",
-                        other.to_string()
-                    ))),
+                    /* Liked Songs playlist */
+                    (PlaylistId::LikedSongs, DeezerResponse::ListTracks(deezer_list)) => {
+                        Ok(Some(Playlist::new(
+                            id.clone(),
+                            id.to_string(),
+                            HashSet::from_iter([ImageCover::Other(
+                                Url::from_str(
+                                    "https://cdn.icon-icons.com/icons2/72/PNG/256/favourite_14390.png",
+                                )
+                                .map_err(|err| PlaylistRepositoryError::ServiceError(err.to_string()))?,
+                            )]),
+                        "me".to_string(),
+                        deezer_list.data.len() as u32,
+                        Url::from_str("https://www.deezer.com/us/profile/me/loved")
+                            .map_err(|err| PlaylistRepositoryError::ServiceError(err.to_string()))?
+                        )))
+                    }
+                    /* Playlist */
+                    (PlaylistId::Owned(_), DeezerResponse::Playlist(deezer_playlist)) => {
+                        Ok(Some((*deezer_playlist).into()))
+                    }
+                    /* Invalid other formats */
+                    _ => Err(PlaylistRepositoryError::ServiceError(
+                        "Invalid format".to_string(),
+                    )),
                 }
             }
+            other => Err(PlaylistRepositoryError::ServiceError(format!(
+                "Failed request: {}",
+                other
+            ))),
         }
     }
 
@@ -167,7 +173,7 @@ impl<'a> PlaylistRepository for DeezerPlaylistRepository<'a> {
                         Ok(deezer_list_playlists
                             .data
                             .into_iter()
-                            .map(|p| Into::<Playlist>::into(p))
+                            .map(Into::<Playlist>::into)
                             .collect())
                     }
                     DeezerResponse::Error(deezer_error_payload) => Err(
@@ -180,15 +186,15 @@ impl<'a> PlaylistRepository for DeezerPlaylistRepository<'a> {
             }
             other => Err(PlaylistRepositoryError::ServiceError(format!(
                 "Failed request: {}",
-                other.to_string()
+                other
             ))),
         }
     }
 
-    async fn create(&self, name: &String) -> PlaylistRepositoryResult<Playlist> {
+    async fn create(&self, name: &str) -> PlaylistRepositoryResult<Playlist> {
         let mut payload = HashMap::new();
 
-        payload.insert("title", name.as_str());
+        payload.insert("title", name);
         let response = self
             .http_client
             .post(format!("{}/user/me/playlists", API_URL))
@@ -208,7 +214,7 @@ impl<'a> PlaylistRepository for DeezerPlaylistRepository<'a> {
                     DeezerResponse::Error(deezer_error_payload) => Err(
                         PlaylistRepositoryError::ServiceError(deezer_error_payload.error.message),
                     ),
-                    DeezerResponse::Playlist(deezer_playlist) => Ok(deezer_playlist.into()),
+                    DeezerResponse::Playlist(deezer_playlist) => Ok((*deezer_playlist).into()),
                     _ => Err(PlaylistRepositoryError::ServiceError(
                         "bad response format".to_string(),
                     )),
@@ -216,7 +222,7 @@ impl<'a> PlaylistRepository for DeezerPlaylistRepository<'a> {
             }
             other => Err(PlaylistRepositoryError::ServiceError(format!(
                 "Failed request: {}",
-                other.to_string()
+                other
             ))),
         }
     }
@@ -246,7 +252,7 @@ impl<'a> PlaylistRepository for DeezerPlaylistRepository<'a> {
                                     deezer_error_payload.error.message,
                                 ))
                             }
-                            DeezerResponse::Playlist(deezer_playlist) => Ok(deezer_playlist.into()),
+                            DeezerResponse::Playlist(deezer_playlist) => Ok((*deezer_playlist).into()),
                             _ => Err(PlaylistRepositoryError::ServiceError(
                                 "bad response format".to_string(),
                             )),
@@ -254,7 +260,7 @@ impl<'a> PlaylistRepository for DeezerPlaylistRepository<'a> {
                     }
                     other => Err(PlaylistRepositoryError::ServiceError(format!(
                         "Failed request: {}",
-                        other.to_string()
+                        other
                     ))),
                 }
             }
@@ -264,7 +270,7 @@ impl<'a> PlaylistRepository for DeezerPlaylistRepository<'a> {
     async fn add_tracks(
         &self,
         playlist_id: &PlaylistId,
-        ids: &Vec<String>,
+        ids: &[String],
     ) -> PlaylistRepositoryResult<()> {
         let mut data = HashMap::new();
 
@@ -301,7 +307,7 @@ impl<'a> PlaylistRepository for DeezerPlaylistRepository<'a> {
                     }
                     other => Err(PlaylistRepositoryError::ServiceError(format!(
                         "Failed request: {}",
-                        other.to_string()
+                        other
                     ))),
                 }
             }
@@ -311,7 +317,7 @@ impl<'a> PlaylistRepository for DeezerPlaylistRepository<'a> {
     async fn delete_tracks(
         &self,
         playlist_id: &PlaylistId,
-        ids: &Vec<String>,
+        ids: &[String],
     ) -> PlaylistRepositoryResult<()> {
         let mut data = HashMap::new();
 
@@ -373,7 +379,7 @@ impl<'a> PlaylistRepository for DeezerPlaylistRepository<'a> {
             }
             other => Err(PlaylistRepositoryError::ServiceError(format!(
                 "Failed request: {}",
-                other.to_string()
+                other
             ))),
         }
     }
