@@ -1,0 +1,15 @@
+{
+  "id": "deezer",
+  "name": "Deezer",
+  "color": "#A238FF",
+  "oauth2": {
+    "baseUrl": "https://connect.deezer.com/oauth/auth.php",
+    "tokenUrl": "https://accounts.spotify.com/api/token",
+    "scope": [
+        "manage_library",
+        "delete_library",
+        "basic_access",
+        "email"
+      ]
+  }
+}

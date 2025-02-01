@@ -1,0 +1,17 @@
+{
+  "id": "spotify",
+  "name": "Spotify",
+  "color": "#1DB954",
+  "oauth2": {
+    "baseUrl": "https://accounts.spotify.com/authorize",
+    "tokenUrl": "https://accounts.spotify.com/api/token",
+    "scope": [
+        "user-library-read",
+        "user-library-modify",
+        "playlist-modify-private",
+        "playlist-read-private",
+        "user-read-email",
+        "user-read-private"
+      ]
+  }
+}

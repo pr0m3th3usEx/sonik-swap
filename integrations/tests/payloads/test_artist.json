@@ -1,0 +1,16 @@
+{
+  "id": "178008437",
+  "name": "NewJeans",
+  "link": "https://www.deezer.com/artist/178008437",
+  "share": "https://www.deezer.com/artist/178008437?utm_source=deezer&utm_content=artist-178008437&utm_term=0_1737804869&utm_medium=web",
+  "picture": "https://api.deezer.com/artist/178008437/image",
+  "picture_small": "https://cdn-images.dzcdn.net/images/artist/cd11bd93b4d221152a098eb5bfeaf8d3/56x56-000000-80-0-0.jpg",
+  "picture_medium": "https://cdn-images.dzcdn.net/images/artist/cd11bd93b4d221152a098eb5bfeaf8d3/250x250-000000-80-0-0.jpg",
+  "picture_big": "https://cdn-images.dzcdn.net/images/artist/cd11bd93b4d221152a098eb5bfeaf8d3/500x500-000000-80-0-0.jpg",
+  "picture_xl": "https://cdn-images.dzcdn.net/images/artist/cd11bd93b4d221152a098eb5bfeaf8d3/1000x1000-000000-80-0-0.jpg",
+  "nb_album": 13,
+  "nb_fan": 220316,
+  "radio": true,
+  "tracklist": "https://api.deezer.com/artist/178008437/top?limit=50",
+  "type": "artist"
+}

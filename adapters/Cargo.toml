@@ -1,10 +1,11 @@
 [package]
-name = "snk-core"
+name = "adapters"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+snk-core.workspace = true
+
+uuid.workspace = true
 chrono.workspace = true
 url.workspace = true
-thiserror.workspace = true
-uuid.workspace = true

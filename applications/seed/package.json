@@ -1,0 +1,20 @@
+{
+  "name": "db_manager",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.ts",
+  "scripts": {
+    "start": "esrun src/main.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "esrun": "^3.2.26",
+    "prisma": "6.0.1"
+  },
+  "dependencies": {
+    "@prisma/client": "6.0.1"
+  }
+}
