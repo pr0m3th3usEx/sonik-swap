@@ -94,6 +94,40 @@ pub struct SpotifyAlbum {
     pub popularity: u32,
 }
 
+
+#[derive(Debug, Deserialize)]
+pub struct SpotifyPlaylistTrackAlbum {
+    /// The Spotify ID for the album.
+    pub id: String,
+    /// The type of the album.
+    pub album_type: SpotifyAlbumType,
+    /// The number of tracks in the album.
+    pub total_tracks: u32,
+    /// The markets in which the album is available: ISO 3166-1 alpha-2 country codes.
+    /// NOTE: an album is considered available in a market when at least 1 of its tracks is available in that market.
+    pub available_markets: Vec<String>,
+    /// Known external URLs for this album.
+    pub external_urls: SpotifyExternalUrls,
+    /// A link to the Web API endpoint providing full details of the album.
+    pub href: Url,
+    /// The cover art for the album in various sizes, widest first.
+    pub images: Vec<SpotifyImage>,
+    /// The name of the album. In case of an album takedown, the value may be an empty string.
+    pub name: String,
+    /// The date the album was first released.
+    pub release_date: String,
+    /// The precision with which release_date value is known.
+    pub release_date_precision: SpotifyReleaseDatePrecision,
+    /// Included in the response when a content restriction is applied.
+    pub restrictions: Option<SpotifyRestriction>,
+    /// The object type => "album"
+    #[serde(alias = "type")]
+    pub _type: String,
+    /// The artists of the album.
+    /// Each artist object includes a link in href to more detailed information about the artist.
+    pub artists: Vec<SpotifySimplifiedArtist>,
+}
+
 #[cfg(test)]
 pub mod tests {
     use crate::spotify::album::SpotifyAlbum;

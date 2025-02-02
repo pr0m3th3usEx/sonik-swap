@@ -8,9 +8,9 @@ pub struct SpotifyImage {
     /// The source URL of the image.
     pub url: Url,
     /// The image width in pixels.
-    pub width: u32,
+    pub width: Option<u32>,
     /// The image height in pixels.
-    pub height: u32,
+    pub height: Option<u32>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -78,3 +78,12 @@ pub struct SpotifyExternalIds {
     pub upc: Option<String>,
     pub ean: Option<String>,
 }
+
+#[derive(Debug, Deserialize)]
+pub struct SpotifyFollowers {
+    /// This will always be set to null, as the Web API does not support it at the moment
+    pub href: Option<Url>,
+    /// The total number of followers.
+    pub total: u32,
+}
+

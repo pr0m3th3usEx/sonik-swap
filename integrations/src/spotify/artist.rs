@@ -1,7 +1,7 @@
 use serde::Deserialize;
 use url::Url;
 
-use super::common::{SpotifyExternalUrls, SpotifyImage};
+use super::common::{SpotifyExternalUrls, SpotifyFollowers, SpotifyImage};
 
 #[derive(Debug, Deserialize)]
 pub struct SpotifySimplifiedArtist {
@@ -19,15 +19,6 @@ pub struct SpotifySimplifiedArtist {
     /// The Spotify URI for the artist.
     pub uri: String,
 }
-
-#[derive(Debug, Deserialize)]
-pub struct SpotifyArtistFollowers {
-    /// This will always be set to null, as the Web API does not support it at the moment
-    pub href: Option<Url>,
-    /// The total number of followers.
-    pub total: u32,
-}
-
 #[derive(Debug, Deserialize)]
 pub struct SpotifyArtist {
     /// The Spotify ID for the artist.
@@ -44,7 +35,7 @@ pub struct SpotifyArtist {
     /// The Spotify URI for the artist.
     pub uri: String,
     /// Information about the followers of the artist.
-    pub followers: SpotifyArtistFollowers,
+    pub followers: SpotifyFollowers,
     /// A list of the genres the artist is associated with. If not yet classified, the array is empty.
     pub genres: Vec<String>,
     /// A link to the Web API endpoint providing full details of the artist.
