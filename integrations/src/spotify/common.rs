@@ -86,4 +86,3 @@ pub struct SpotifyFollowers {
     /// The total number of followers.
     pub total: u32,
 }
-

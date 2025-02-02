@@ -3,7 +3,9 @@ use serde::Deserialize;
 use url::Url;
 
 use super::{
-    album::SpotifyTrackAlbum, artist::SpotifySimplifiedArtist, common::{SpotifyExternalIds, SpotifyExternalUrls, SpotifyRestriction}
+    album::SpotifyTrackAlbum,
+    artist::SpotifySimplifiedArtist,
+    common::{SpotifyExternalIds, SpotifyExternalUrls, SpotifyRestriction},
 };
 
 #[derive(Debug, Deserialize)]
@@ -84,7 +86,7 @@ pub struct SpotifyPlaylistTrack {
     pub added_by: SpotifyPlaylistTrackAddedBy,
     /// Whether this track or episode is a local file or not.
     pub is_local: bool,
-    /// Information about the track or episode. 
+    /// Information about the track or episode.
     /// We only handling when it's a track
     pub track: SpotifyTrack,
 }
@@ -121,7 +123,7 @@ pub struct SpotifyTrack {
     pub restrictions: Option<SpotifyRestriction>,
     /// The name of the track.
     pub name: String,
-    /// The popularity of the track. 
+    /// The popularity of the track.
     pub popularity: u32,
     /// A link to a 30 second preview (MP3 format) of the track. Can be null
     #[deprecated]
@@ -134,7 +136,7 @@ pub struct SpotifyTrack {
     /// The Spotify URI of the track
     pub uri: String,
     /// Whether or not the track is from a local file.
-    pub is_local: bool,    
+    pub is_local: bool,
 }
 
 #[cfg(test)]
@@ -145,7 +147,7 @@ mod tests {
     fn test_deserialize_track() {
         let payload = include_str!("../../tests/spotify/payload_track.json");
         let json = serde_json::from_str::<SpotifyTrack>(&payload).expect("valid json");
-    
+
         assert_eq!(json.name, "How Sweet");
         assert_eq!(json.artists[0].name, "NewJeans");
     }

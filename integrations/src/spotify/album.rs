@@ -94,7 +94,6 @@ pub struct SpotifyAlbum {
     pub popularity: u32,
 }
 
-
 #[derive(Debug, Deserialize)]
 pub struct SpotifyTrackAlbum {
     /// The Spotify ID for the album.

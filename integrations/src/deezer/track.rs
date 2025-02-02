@@ -240,7 +240,7 @@ mod tests {
 
     #[test]
     pub fn test_deserialize_playlist() {
-        let json_str = include_str!("../../tests/payloads/test_track.json");
+        let json_str = include_str!("../../tests/deezer/payload_track.json");
         let json = serde_json::from_str::<DeezerTrack>(&json_str).expect("valid json");
 
         assert_eq!(json.title, "How Sweet");
