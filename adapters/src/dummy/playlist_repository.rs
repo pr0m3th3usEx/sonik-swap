@@ -3,12 +3,7 @@ use std::collections::{HashMap, HashSet};
 use chrono::DateTime;
 use snk_core::{
     contracts::repositories::playlist_repository::{PlaylistRepository, PlaylistRepositoryResult},
-    entities::{
-        album::Album,
-        artist::Artist,
-        playlist::Playlist,
-        track::TrackWithAlbumAndArtists,
-    },
+    entities::{album::Album, artist::Artist, playlist::Playlist, track::TrackWithAlbumAndArtists},
     value_objects::{
         image_cover::ImageCover, playlist_id::PlaylistId, product_id::ProductId,
         provider::provider_id::ProviderId,
@@ -74,7 +69,7 @@ impl PlaylistRepository for DummyPlaylistRepository {
     async fn add_tracks(
         &self,
         _playlist_id: &PlaylistId,
-        _ids:&[String],
+        _ids: &[String],
     ) -> PlaylistRepositoryResult<()> {
         Ok(())
     }
@@ -113,19 +108,18 @@ impl PlaylistRepository for DummyPlaylistRepository {
               ])
             ),
             vec![
-              
-            Artist::new(
-              HashMap::from_iter([
-                  (ProviderId::new(String::from("deezer")), String::from("deezer_artist_id"))
-              ]),
-              String::from("Khelani"),
-              HashSet::from_iter([
-                  ImageCover::Sm(Url::parse("https://cdn-images.dzcdn.net/images/artist/2bf1fa3d1cc1716f784dadf112d16d9e/500x500-000000-80-0-0.jpg").unwrap())
-              ]),
-              HashMap::from_iter([
-                  (ProviderId::new(String::from("deezer")), Url::parse("https://www.deezer.com/us/artist/5603027").unwrap())
-              ])
-            )
+                Artist::new(
+                    HashMap::from_iter([
+                        (ProviderId::new(String::from("deezer")), String::from("deezer_artist_id"))
+                    ]),
+                    String::from("Khelani"),
+                    HashSet::from_iter([
+                        ImageCover::Sm(Url::parse("https://cdn-images.dzcdn.net/images/artist/2bf1fa3d1cc1716f784dadf112d16d9e/500x500-000000-80-0-0.jpg").unwrap())
+                    ]),
+                    HashMap::from_iter([
+                        (ProviderId::new(String::from("deezer")), Url::parse("https://www.deezer.com/us/artist/5603027").unwrap())
+                    ])
+                )
             ])
           ])
     }

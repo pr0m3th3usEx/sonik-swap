@@ -8,9 +8,13 @@ pub enum PlaylistId {
 
 impl Display for PlaylistId {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", match self {
-            PlaylistId::LikedSongs => "favourites",
-            PlaylistId::Owned(name) => name,
-        })
+        write!(
+            f,
+            "{}",
+            match self {
+                PlaylistId::LikedSongs => "favourites",
+                PlaylistId::Owned(name) => name,
+            }
+        )
     }
 }
