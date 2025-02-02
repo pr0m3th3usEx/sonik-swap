@@ -99,9 +99,8 @@ pub mod tests {
     use crate::spotify::album::SpotifyAlbum;
 
     #[test]
-    pub fn test_deserialize_album() {
+    fn test_deserialize_album() {
         let payload = include_str!("../../tests/spotify/payload_album.json");
-
         let json = serde_json::from_str::<SpotifyAlbum>(&payload).expect("valid json");
 
         assert_eq!(json.name, "Global Warming");
