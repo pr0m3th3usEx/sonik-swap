@@ -96,7 +96,7 @@ pub struct SpotifyAlbum {
 
 
 #[derive(Debug, Deserialize)]
-pub struct SpotifyPlaylistTrackAlbum {
+pub struct SpotifyTrackAlbum {
     /// The Spotify ID for the album.
     pub id: String,
     /// The type of the album.
