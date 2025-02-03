@@ -6,8 +6,7 @@ use url::Url;
 use super::{
     artist::SpotifySimplifiedArtist,
     common::{
-        SpotifyCopyright, SpotifyExternalIds, SpotifyExternalUrls, SpotifyImage,
-        SpotifyReleaseDatePrecision, SpotifyRestriction,
+        SpotifyCopyright, SpotifyExternalIds, SpotifyExternalUrls, SpotifyImage, SpotifyList, SpotifyReleaseDatePrecision, SpotifyRestriction
     },
     track::SpotifySimplifiedTrack,
 };
@@ -33,23 +32,23 @@ impl FromStr for SpotifyAlbumType {
     }
 }
 
-#[derive(Debug, Deserialize)]
-pub struct SpotifyAlbumTracks {
-    /// A link to the Web API endpoint returning the full result of the request
-    pub href: Url,
-    /// The maximum number of items in the response (as set in the query or by default).
-    pub limit: u32,
-    /// URL to the next page of items. ( null if none)
-    pub next: Option<Url>,
-    /// URL to the previous page of items. ( null if none)
-    pub previous: Option<Url>,
-    /// The offset of the items returned (as set in the query or by default)
-    pub offset: u32,
-    /// The total number of items available to return.
-    pub total: u32,
-    /// List of tracks (simplified)
-    pub items: Vec<SpotifySimplifiedTrack>,
-}
+// #[derive(Debug, Deserialize)]
+// pub struct SpotifyAlbumTracks {
+//     /// A link to the Web API endpoint returning the full result of the request
+//     pub href: Url,
+//     /// The maximum number of items in the response (as set in the query or by default).
+//     pub limit: u32,
+//     /// URL to the next page of items. ( null if none)
+//     pub next: Option<Url>,
+//     /// URL to the previous page of items. ( null if none)
+//     pub previous: Option<Url>,
+//     /// The offset of the items returned (as set in the query or by default)
+//     pub offset: u32,
+//     /// The total number of items available to return.
+//     pub total: u32,
+//     /// List of tracks (simplified)
+//     pub items: Vec<>,
+// }
 
 #[derive(Debug, Deserialize)]
 pub struct SpotifyAlbum {
@@ -83,7 +82,7 @@ pub struct SpotifyAlbum {
     /// Each artist object includes a link in href to more detailed information about the artist.
     pub artists: Vec<SpotifySimplifiedArtist>,
     /// The tracks of the album.
-    pub tracks: SpotifyAlbumTracks,
+    pub tracks: SpotifyList<SpotifySimplifiedTrack>,
     /// The copyright statements of the album.
     pub copyrights: Vec<SpotifyCopyright>,
     /// Known external IDs for the album.

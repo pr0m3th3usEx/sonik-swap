@@ -92,6 +92,16 @@ pub struct SpotifyPlaylistTrack {
 }
 
 #[derive(Debug, Deserialize)]
+pub struct SpotifySavedTrack {
+    /// The date and time the track or episode was added.
+    /// Note: some very old playlists may return null in this field.
+    pub added_at: DateTime<Utc>,
+    /// Information about the track or episode.
+    /// We only handling when it's a track
+    pub track: SpotifyTrack,
+}
+
+#[derive(Debug, Deserialize)]
 pub struct SpotifyTrack {
     /// The album on which the track appears. The album object includes a link in href to full information about the album.
     pub album: SpotifyTrackAlbum,

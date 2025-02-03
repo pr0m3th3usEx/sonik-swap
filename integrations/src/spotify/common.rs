@@ -4,6 +4,17 @@ use serde::Deserialize;
 use url::Url;
 
 #[derive(Debug, Deserialize)]
+pub struct SpotifyList<T> {
+    pub href: Url,
+    pub limit: u32,
+    pub next: Option<Url>,
+    pub previous: Option<Url>,
+    pub offset: u32,
+    pub total: u32,
+    pub items: Vec<T>
+} 
+
+#[derive(Debug, Deserialize)]
 pub struct SpotifyImage {
     /// The source URL of the image.
     pub url: Url,
