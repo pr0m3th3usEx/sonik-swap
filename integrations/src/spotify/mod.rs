@@ -1,11 +1,12 @@
 use std::time::Duration;
 
+use playlist::SpotifyPlaylist;
 use reqwest::{
     header::{HeaderMap, HeaderValue},
     Client,
 };
 use snk_core::{
-    contracts::repositories::playlist_repository::{PlaylistRepository, PlaylistRepositoryResult},
+    contracts::repositories::playlist_repository::{PlaylistRepository, PlaylistRepositoryError, PlaylistRepositoryResult},
     entities::{
         music_account_provider::MusicAccountProvider, playlist::Playlist,
         track::TrackWithAlbumAndArtists,
@@ -60,7 +61,40 @@ impl<'a> SpotifyPlaylistRepository<'a> {
 
 impl<'a> PlaylistRepository for SpotifyPlaylistRepository<'a> {
     async fn get(&self, id: &PlaylistId) -> PlaylistRepositoryResult<Option<Playlist>> {
-        todo!()
+        match id {
+            PlaylistId::LikedSongs => todo!(),
+            PlaylistId::Owned(playlist_id) => {
+                let url = format!("{}/playlist/{}", API_URL, playlist_id);
+
+                let response = self.http_client
+                    .get(url)
+                    .send()
+                    .await
+                    .map_err(|err| PlaylistRepositoryError::ServiceError(format!("PlaylistRepository - Failed to fetch request - {:?}", err)))?;
+
+                match response.error_for_status() {
+                    Ok(res) => {
+                        let playlist = res.json::<SpotifyPlaylist>()
+                            .await
+                            .map_err(|err| PlaylistRepositoryError::ServiceError(format!("PlaylistRepository - Failed to parse response - {:?}", err)))?;
+
+
+                        return Ok(Some(playlist.into()));
+                    },
+                    Err(err) => {
+                        let Some(status) = err.status() else {
+                            return Err(PlaylistRepositoryError::ServiceError(format!("PlaylistRepository - Error during request - {:?}", err)));
+                        };
+
+                        if status == 404 {
+                            return Ok(None);
+                        }
+                        
+                        return Err(PlaylistRepositoryError::ServiceError(format!("PlaylistRepository - Error during request - {:?}", err)));
+                    }
+                }
+            }
+        }
     }
 
     async fn get_all(&self) -> PlaylistRepositoryResult<Vec<Playlist>> {

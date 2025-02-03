@@ -1,4 +1,7 @@
+use std::collections::{HashMap, HashSet};
+
 use serde::Deserialize;
+use snk_core::{entities::playlist::Playlist, value_objects::{image_cover::ImageCover, playlist_id::PlaylistId}};
 use url::Url;
 
 use super::{
@@ -69,6 +72,46 @@ pub struct SpotifyPlaylist {
     pub _type: String,
     /// The Spotify URI for the playlist
     pub uri: String,
+}
+
+impl From<SpotifyPlaylist> for Playlist {
+    fn from(spotify_playlist: SpotifyPlaylist) -> Self {
+        let playlist_id = PlaylistId::Owned(spotify_playlist.id);
+        let name = spotify_playlist.name;
+        let owner = spotify_playlist.owner.display_name;
+        let total_songs = spotify_playlist.tracks.total;
+        let provider_url = spotify_playlist.external_urls.spotify;
+        let mut covers: HashSet<ImageCover> = HashSet::new();
+        
+        // The array may be empty or contain up to three images. The images are returned by size in descending order
+        let mut iter = spotify_playlist.images.into_iter();
+
+        // Default & large cover
+        if let Some(image) = iter.next() {
+            covers.insert(ImageCover::Default(image.url.clone()));
+            covers.insert(ImageCover::Lg(image.url));
+        }
+
+        // Medium
+        if let Some(image) = iter.next() {
+            covers.insert(ImageCover::Md(image.url));
+        }
+
+        // Small
+        if let Some(image) = iter.next() {
+            covers.insert(ImageCover::Sm(image.url));
+        }
+
+
+        Playlist::new(
+            playlist_id,
+            name,
+            covers,
+            owner,
+            total_songs,
+            provider_url,
+        )
+    }
 }
 
 #[cfg(test)]
