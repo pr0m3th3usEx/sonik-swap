@@ -1,4 +1,4 @@
-name: SonikSwap pre-deployment checks
+name: SonikSwap front-end pre-deployment checks
 
 on:
   pull_request:
