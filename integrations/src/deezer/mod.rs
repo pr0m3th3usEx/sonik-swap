@@ -274,6 +274,7 @@ impl<'a> PlaylistRepository for DeezerPlaylistRepository<'a> {
         &self,
         playlist_id: &PlaylistId,
         ids: &[String],
+        _snapshot_id: Option<String>,
     ) -> PlaylistRepositoryResult<()> {
         let mut data = HashMap::new();
 

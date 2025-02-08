@@ -9,6 +9,7 @@ use reqwest::{
     header::{HeaderMap, HeaderValue},
     Client,
 };
+use serde_json::json;
 use snk_core::{
     contracts::repositories::playlist_repository::{
         PlaylistRepository, PlaylistRepositoryError, PlaylistRepositoryResult,
@@ -253,8 +254,63 @@ impl<'a> PlaylistRepository for SpotifyPlaylistRepository<'a> {
         &self,
         playlist_id: &PlaylistId,
         ids: &[String],
+        snapshot_id: Option<String>,
     ) -> PlaylistRepositoryResult<()> {
-        todo!()
+        let response = match playlist_id {
+            PlaylistId::LikedSongs => {
+                let mut payload = HashMap::new();
+                let url = format!("{}/me/tracks", API_URL);
+
+                payload.insert(
+                    "ids",
+                    ids.iter()
+                        .map(|id| format!("spotify:track:{}", id))
+                        .collect::<Vec<String>>(),
+                );
+
+                self.http_client
+                    .post(url)
+                    .json(&payload)
+                    .send()
+                    .await
+                    .map_err(|err| {
+                        PlaylistRepositoryError::ServiceError(format!(
+                            "PlaylistRepository - Failed to send request - {:?}",
+                            err
+                        ))
+                    })?
+            }
+            PlaylistId::Owned(spotify_id) => {
+                let url = format!("{}/playlists/{}/tracks", API_URL, spotify_id);
+                let uris = ids
+                    .iter()
+                    .map(|id| format!("spotify:track:{}", id))
+                    .collect::<Vec<String>>();
+
+                self.http_client
+                    .post(url)
+                    .json(&json!({
+                        "ids": uris,
+                        "snapshot_id": snapshot_id,
+                    }))
+                    .send()
+                    .await
+                    .map_err(|err| {
+                        PlaylistRepositoryError::ServiceError(format!(
+                            "PlaylistRepository - Failed to send request - {:?}",
+                            err
+                        ))
+                    })?
+            }
+        };
+
+        match response.error_for_status() {
+            Ok(_) => Ok(()),
+            Err(err) => Err(PlaylistRepositoryError::ServiceError(format!(
+                "PlaylistRepository - Error during request - {:?}",
+                err
+            ))),
+        }
     }
 
     async fn delete_tracks(

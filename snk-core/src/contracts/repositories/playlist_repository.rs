@@ -30,6 +30,7 @@ pub trait PlaylistRepository {
         &self,
         playlist_id: &PlaylistId,
         ids: &[String],
+        snapshot_id: Option<String>,
     ) -> PlaylistRepositoryResult<()>;
 
     async fn delete_tracks(
