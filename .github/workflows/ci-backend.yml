@@ -1,0 +1,34 @@
+name: SonikSwap pre-deployment checks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - preprod
+      - main
+
+jobs:
+  lint:
+    name: Lint application
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - run: cargo fmt --all -- --check
+      - run: cargo clippy --all-features -- -D warnings
+  
+  test:
+    name: Test application
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - run: cargo test --all-features
+
+  build:
+    name: Build application
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - run: cargo build
