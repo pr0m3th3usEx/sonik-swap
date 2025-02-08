@@ -1,4 +1,7 @@
+use std::collections::HashMap;
+
 use serde::Deserialize;
+use snk_core::{entities::artist::Artist, value_objects::provider::provider_id::ProviderId};
 use url::Url;
 
 use super::common::{SpotifyExternalUrls, SpotifyFollowers, SpotifyImage};
@@ -19,6 +22,19 @@ pub struct SpotifySimplifiedArtist {
     /// The Spotify URI for the artist.
     pub uri: String,
 }
+
+impl From<SpotifySimplifiedArtist> for Artist {
+    fn from(spotify_artist: SpotifySimplifiedArtist) -> Self {
+        let name = spotify_artist.name;
+        let provider_urls = spotify_artist.external_urls.into();
+        let mut ids = HashMap::new();
+
+        ids.insert(ProviderId::new("spotify".to_string()), spotify_artist.id);
+
+        Artist::new(ids, name, provider_urls)
+    }
+}
+
 #[derive(Debug, Deserialize)]
 pub struct SpotifyArtist {
     /// The Spotify ID for the artist.

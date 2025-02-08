@@ -1,7 +1,7 @@
 use std::{collections::HashSet, time::Duration};
 
 use common::SpotifyList;
-use playlist::SpotifyPlaylist;
+use playlist::{SpotifyPlaylist, SpotifySimplifiedPlaylist};
 use reqwest::{
     header::{HeaderMap, HeaderValue},
     Client,
@@ -79,47 +79,48 @@ impl<'a> PlaylistRepository for SpotifyPlaylistRepository<'a> {
         })?;
 
         match response.error_for_status() {
-            Ok(res) => {
-                match id {
-                    PlaylistId::LikedSongs => {
-                        let favorite_tracks = res
-                            .json::<SpotifyList<SpotifySavedTrack>>()
-                            .await
-                            .map_err(|err| {
-                                PlaylistRepositoryError::ServiceError(format!(
-                                    "PlaylistRepository - Failed to parse response - {:?}",
-                                    err
-                                ))
-                            })?;
-
-                        Ok(Some(Playlist::new(
-                            id.clone(),
-                            id.to_string(),
-                            HashSet::from_iter([ImageCover::Other(
-                                "https://cdn.icon-icons.com/icons2/72/PNG/256/favourite_14390.png"
-                                    .parse::<Url>()
-                                    .map_err(|err| PlaylistRepositoryError::ServiceError(err.to_string()))?,
-                            )]),
-                            "me".to_string(),
-
-                            favorite_tracks.total,
-                            "https://open.spotify.com/collection/tracks"
-                                .parse::<Url>()
-                                .map_err(|err| PlaylistRepositoryError::ServiceError(err.to_string()))?
-                        )))
-                    }
-                    PlaylistId::Owned(_) => {
-                        let playlist = res.json::<SpotifyPlaylist>().await.map_err(|err| {
+            Ok(res) => match id {
+                PlaylistId::LikedSongs => {
+                    let favorite_tracks = res
+                        .json::<SpotifyList<SpotifySavedTrack>>()
+                        .await
+                        .map_err(|err| {
                             PlaylistRepositoryError::ServiceError(format!(
                                 "PlaylistRepository - Failed to parse response - {:?}",
                                 err
                             ))
                         })?;
 
-                        Ok(Some(playlist.into()))
-                    }
+                    Ok(Some(Playlist::new(
+                        id.clone(),
+                        id.to_string(),
+                        HashSet::from_iter([ImageCover::Other(
+                            "https://cdn.icon-icons.com/icons2/72/PNG/256/favourite_14390.png"
+                                .parse::<Url>()
+                                .map_err(|err| {
+                                    PlaylistRepositoryError::ServiceError(err.to_string())
+                                })?,
+                        )]),
+                        "me".to_string(),
+                        favorite_tracks.total,
+                        "https://open.spotify.com/collection/tracks"
+                            .parse::<Url>()
+                            .map_err(|err| {
+                                PlaylistRepositoryError::ServiceError(err.to_string())
+                            })?,
+                    )))
                 }
-            }
+                PlaylistId::Owned(_) => {
+                    let playlist = res.json::<SpotifyPlaylist>().await.map_err(|err| {
+                        PlaylistRepositoryError::ServiceError(format!(
+                            "PlaylistRepository - Failed to parse response - {:?}",
+                            err
+                        ))
+                    })?;
+
+                    Ok(Some(playlist.into()))
+                }
+            },
             Err(err) => {
                 let Some(status) = err.status() else {
                     return Err(PlaylistRepositoryError::ServiceError(format!(
@@ -141,7 +142,38 @@ impl<'a> PlaylistRepository for SpotifyPlaylistRepository<'a> {
     }
 
     async fn get_all(&self) -> PlaylistRepositoryResult<Vec<Playlist>> {
-        todo!()
+        let url = format!("{}/me/playlists", API_URL);
+
+        let response = self.http_client.get(url).send().await.map_err(|err| {
+            PlaylistRepositoryError::ServiceError(format!(
+                "PlaylistRepository - Failed to fetch request - {:?}",
+                err
+            ))
+        })?;
+
+        match response.error_for_status() {
+            Ok(res) => {
+                let playlists = res
+                    .json::<SpotifyList<SpotifySimplifiedPlaylist>>()
+                    .await
+                    .map_err(|err| {
+                        PlaylistRepositoryError::ServiceError(format!(
+                            "PlaylistRepository - Failed to parse response - {:?}",
+                            err
+                        ))
+                    })?;
+
+                Ok(playlists
+                    .items
+                    .into_iter()
+                    .map(|playlist| playlist.into())
+                    .collect())
+            }
+            Err(err) => Err(PlaylistRepositoryError::ServiceError(format!(
+                "PlaylistRepository - Error during request - {:?}",
+                err
+            ))),
+        }
     }
 
     async fn create(&self, name: &str) -> PlaylistRepositoryResult<Playlist> {
@@ -172,6 +204,59 @@ impl<'a> PlaylistRepository for SpotifyPlaylistRepository<'a> {
         &self,
         playlist_id: &PlaylistId,
     ) -> PlaylistRepositoryResult<Vec<TrackWithAlbumAndArtists>> {
-        todo!()
+        let url = match playlist_id {
+            PlaylistId::LikedSongs => format!("{}/me/tracks", API_URL),
+            PlaylistId::Owned(pid) => format!("{}/playlist/{}", API_URL, pid),
+        };
+
+        let response = self.http_client.get(url).send().await.map_err(|err| {
+            PlaylistRepositoryError::ServiceError(format!(
+                "PlaylistRepository - Failed to fetch request - {:?}",
+                err
+            ))
+        })?;
+
+        match response.error_for_status() {
+            Ok(res) => match playlist_id {
+                PlaylistId::LikedSongs => {
+                    let favorite_tracks = res
+                        .json::<SpotifyList<SpotifySavedTrack>>()
+                        .await
+                        .map_err(|err| {
+                            PlaylistRepositoryError::ServiceError(format!(
+                                "PlaylistRepository - Failed to parse response - {:?}",
+                                err
+                            ))
+                        })?;
+
+                    // TODO Fetch all tracks
+                    Ok(favorite_tracks
+                        .items
+                        .into_iter()
+                        .map(|track| TrackWithAlbumAndArtists::from(track.track))
+                        .collect())
+                }
+                PlaylistId::Owned(_) => {
+                    let playlist = res.json::<SpotifyPlaylist>().await.map_err(|err| {
+                        PlaylistRepositoryError::ServiceError(format!(
+                            "PlaylistRepository - Failed to parse response - {:?}",
+                            err
+                        ))
+                    })?;
+
+                    // TODO Fetch all tracks
+                    Ok(playlist
+                        .tracks
+                        .items
+                        .into_iter()
+                        .map(|track| TrackWithAlbumAndArtists::from(track.track))
+                        .collect())
+                }
+            },
+            Err(err) => Err(PlaylistRepositoryError::ServiceError(format!(
+                "PlaylistRepository - Error during request - {:?}",
+                err
+            ))),
+        }
     }
 }

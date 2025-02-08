@@ -1,5 +1,11 @@
+use std::collections::HashSet;
+
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
+use snk_core::{
+    entities::track::TrackWithAlbumAndArtists,
+    value_objects::{product_id::ProductId, provider::provider_id::ProviderId},
+};
 use url::Url;
 
 use super::{
@@ -147,6 +153,25 @@ pub struct SpotifyTrack {
     pub uri: String,
     /// Whether or not the track is from a local file.
     pub is_local: bool,
+}
+
+impl From<SpotifyTrack> for TrackWithAlbumAndArtists {
+    fn from(spotify_track: SpotifyTrack) -> Self {
+        let mut ids = HashSet::new();
+
+        ids.insert(ProductId::Provider((
+            ProviderId::new("spotify".to_string()),
+            spotify_track.id,
+        )));
+        let name = spotify_track.name;
+        let duration_ms = spotify_track.duration_ms;
+        let provider_urls = spotify_track.external_urls.into();
+
+        let album = spotify_track.album.into();
+        let artists = spotify_track.artists.into_iter().map(Into::into).collect();
+
+        TrackWithAlbumAndArtists::new(ids, name, duration_ms, provider_urls, album, artists)
+    }
 }
 
 #[cfg(test)]

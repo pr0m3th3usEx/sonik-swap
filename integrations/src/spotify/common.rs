@@ -1,6 +1,8 @@
-use std::str::FromStr;
+use std::{collections::HashMap, str::FromStr};
 
+use chrono::{DateTime, NaiveDateTime, Utc};
 use serde::Deserialize;
+use snk_core::value_objects::provider::provider_id::ProviderId;
 use url::Url;
 
 #[derive(Debug, Deserialize)]
@@ -11,8 +13,8 @@ pub struct SpotifyList<T> {
     pub previous: Option<Url>,
     pub offset: u32,
     pub total: u32,
-    pub items: Vec<T>
-} 
+    pub items: Vec<T>,
+}
 
 #[derive(Debug, Deserialize)]
 pub struct SpotifyImage {
@@ -45,9 +47,40 @@ impl FromStr for SpotifyReleaseDatePrecision {
     }
 }
 
+pub struct SpotifyDateTimeWrapper(pub DateTime<Utc>);
+
+impl From<(SpotifyReleaseDatePrecision, String)> for SpotifyDateTimeWrapper {
+    fn from((precision, value): (SpotifyReleaseDatePrecision, String)) -> Self {
+        SpotifyDateTimeWrapper(
+            NaiveDateTime::parse_from_str(
+                &value,
+                match precision {
+                    SpotifyReleaseDatePrecision::Year => "%Y",
+                    SpotifyReleaseDatePrecision::Month => "%Y-%m",
+                    SpotifyReleaseDatePrecision::Day => "%Y-%m-%d",
+                },
+            )
+            .unwrap()
+            .and_utc(),
+        )
+    }
+}
+
 #[derive(Debug, Deserialize)]
 pub struct SpotifyExternalUrls {
     pub spotify: Url,
+}
+
+impl From<SpotifyExternalUrls> for HashMap<ProviderId, Url> {
+    fn from(external_urls: SpotifyExternalUrls) -> Self {
+        let mut map = HashMap::new();
+
+        map.insert(
+            ProviderId::new("spotify".to_string()),
+            external_urls.spotify,
+        );
+        map
+    }
 }
 
 #[derive(Debug, Deserialize)]
