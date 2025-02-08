@@ -1,7 +1,7 @@
 use std::{collections::HashMap, str::FromStr};
 
 use chrono::{DateTime, NaiveDateTime, Utc};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use snk_core::value_objects::provider::provider_id::ProviderId;
 use url::Url;
 
@@ -129,4 +129,9 @@ pub struct SpotifyFollowers {
     pub href: Option<Url>,
     /// The total number of followers.
     pub total: u32,
+}
+
+#[derive(Debug, Serialize)]
+pub struct SpotifyUri {
+    pub uri: String,
 }
