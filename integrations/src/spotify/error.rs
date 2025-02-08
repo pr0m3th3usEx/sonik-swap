@@ -2,11 +2,14 @@ use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
 pub struct SpotifyError {
-  error: SpotifyErrorData,
+    #[allow(dead_code)]
+    error: SpotifyErrorData,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct SpotifyErrorData {
-  status: u32,
-  message: String,
+    #[allow(dead_code)]
+    status: u32,
+    #[allow(dead_code)]
+    message: String,
 }

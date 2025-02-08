@@ -7,11 +7,17 @@ use url::Url;
 
 #[derive(Debug, Deserialize)]
 pub struct SpotifyList<T> {
+    #[allow(dead_code)]
     pub href: Url,
+    #[allow(dead_code)]
     pub limit: u32,
+    #[allow(dead_code)]
     pub next: Option<Url>,
+    #[allow(dead_code)]
     pub previous: Option<Url>,
+    #[allow(dead_code)]
     pub offset: u32,
+
     pub total: u32,
     pub items: Vec<T>,
 }
@@ -106,11 +112,13 @@ impl FromStr for SpotifyRestrictionReason {
 
 #[derive(Debug, Deserialize)]
 pub struct SpotifyRestriction {
+    #[allow(dead_code)]
     reason: SpotifyRestrictionReason,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct SpotifyCopyright {
+    #[allow(dead_code)]
     pub text: String,
     #[serde(alias = "type")]
     pub _type: String,

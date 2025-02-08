@@ -73,7 +73,7 @@ impl<'a> SpotifyPlaylistRepository<'a> {
     }
 }
 
-impl<'a> PlaylistRepository for SpotifyPlaylistRepository<'a> {
+impl PlaylistRepository for SpotifyPlaylistRepository<'_> {
     async fn get(&self, id: &PlaylistId) -> PlaylistRepositoryResult<Option<Playlist>> {
         let url = match id {
             PlaylistId::LikedSongs => format!("{}/me/tracks", API_URL),
@@ -142,10 +142,10 @@ impl<'a> PlaylistRepository for SpotifyPlaylistRepository<'a> {
                     return Ok(None);
                 }
 
-                return Err(PlaylistRepositoryError::ServiceError(format!(
+                Err(PlaylistRepositoryError::ServiceError(format!(
                     "PlaylistRepository - Error during request - {:?}",
                     err
-                )));
+                )))
             }
         }
     }
@@ -342,13 +342,14 @@ impl<'a> PlaylistRepository for SpotifyPlaylistRepository<'a> {
                             err
                         ))
                     })?
-
-            },
+            }
             PlaylistId::Owned(spotify_id) => {
                 let url = format!("{}/playlists/{}/tracks", API_URL, spotify_id);
                 let uris = ids
                     .iter()
-                    .map(|id| SpotifyUri { uri: format!("spotify:track:{}", id) })
+                    .map(|id| SpotifyUri {
+                        uri: format!("spotify:track:{}", id),
+                    })
                     .collect::<Vec<_>>();
 
                 self.http_client
@@ -365,7 +366,7 @@ impl<'a> PlaylistRepository for SpotifyPlaylistRepository<'a> {
                             err
                         ))
                     })?
-            },
+            }
         };
 
         match response.error_for_status() {

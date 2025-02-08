@@ -86,7 +86,7 @@ impl<'a> DeezerPlaylistRepository<'a> {
     }
 }
 
-impl<'a> PlaylistRepository for DeezerPlaylistRepository<'a> {
+impl PlaylistRepository for DeezerPlaylistRepository<'_> {
     async fn get(&self, id: &PlaylistId) -> PlaylistRepositoryResult<Option<Playlist>> {
         let response = self
             .http_client

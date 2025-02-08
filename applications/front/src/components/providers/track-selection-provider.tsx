@@ -14,9 +14,9 @@ export interface TrackSelectionContextProps<TData> {
 
 const defaultValue: TrackSelectionContextProps<any> = {
   rowSelection: {},
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   setRowSelection: (_) => {},
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   setDataSelected: (_) => {},
   nbRowsSelected: 0,
   dataSelected: [],
