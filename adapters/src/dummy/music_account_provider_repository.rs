@@ -12,7 +12,7 @@ pub struct DummyMusicAccountProviderRepository {}
 impl MusicAccountProviderRepository for DummyMusicAccountProviderRepository {
     async fn get(
         &self,
-        id: Uuid,
+        _id: Uuid,
     ) -> MusicAccountProviderRepositoryResult<Option<MusicAccountProvider>> {
         Ok(Some(MusicAccountProvider::new(
             ProviderId::new(String::from("spotify")),

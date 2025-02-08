@@ -142,10 +142,10 @@ impl<'a> PlaylistRepository for SpotifyPlaylistRepository<'a> {
                     return Ok(None);
                 }
 
-                return Err(PlaylistRepositoryError::ServiceError(format!(
+                Err(PlaylistRepositoryError::ServiceError(format!(
                     "PlaylistRepository - Error during request - {:?}",
                     err
-                )));
+                )))
             }
         }
     }
