@@ -22,7 +22,7 @@ pub trait PlaylistRepository {
 
     async fn create(&self, name: &str) -> PlaylistRepositoryResult<Playlist>;
 
-    async fn delete(&self, id: &PlaylistId) -> PlaylistRepositoryResult<Playlist>;
+    async fn delete(&self, id: &PlaylistId) -> PlaylistRepositoryResult<Option<Playlist>>;
 
     // Tracks related
 

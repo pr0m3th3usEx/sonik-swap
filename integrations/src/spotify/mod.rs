@@ -1,4 +1,7 @@
-use std::{collections::{HashMap, HashSet}, time::Duration};
+use std::{
+    collections::{HashMap, HashSet},
+    time::Duration,
+};
 
 use common::SpotifyList;
 use playlist::{SpotifyPlaylist, SpotifySimplifiedPlaylist};
@@ -185,7 +188,7 @@ impl<'a> PlaylistRepository for SpotifyPlaylistRepository<'a> {
         let url = format!("{}/user/{}/playlists", API_URL, self.username);
 
         let mut body: HashMap<&str, &str> = HashMap::new();
-        
+
         body.insert("name", name);
         body.insert("description", "Playlist created thanks SonikSwap");
 
@@ -212,16 +215,38 @@ impl<'a> PlaylistRepository for SpotifyPlaylistRepository<'a> {
                 })?;
 
                 Ok(playlist.into())
-            },
+            }
             Err(err) => Err(PlaylistRepositoryError::ServiceError(format!(
                 "PlaylistRepository - Error during request - {:?}",
                 err
-            )))
+            ))),
         }
     }
 
-    async fn delete(&self, id: &PlaylistId) -> PlaylistRepositoryResult<Playlist> {
-        todo!()
+    async fn delete(&self, id: &PlaylistId) -> PlaylistRepositoryResult<Option<Playlist>> {
+        match id {
+            PlaylistId::LikedSongs => Err(PlaylistRepositoryError::ServiceError(
+                "operation not permitted with favourite tracks list".to_string(),
+            )),
+            PlaylistId::Owned(spotify_id) => {
+                let url = format!("{}/playlists/{}/followers", API_URL, spotify_id);
+
+                let response = self.http_client.delete(url).send().await.map_err(|err| {
+                    PlaylistRepositoryError::ServiceError(format!(
+                        "PlaylistRepository - Failed to send request - {:?}",
+                        err
+                    ))
+                })?;
+
+                match response.error_for_status() {
+                    Ok(_) => Ok(None),
+                    Err(err) => Err(PlaylistRepositoryError::ServiceError(format!(
+                        "PlaylistRepository - Error during request - {:?}",
+                        err
+                    ))),
+                }
+            }
+        }
     }
 
     async fn add_tracks(
@@ -246,7 +271,7 @@ impl<'a> PlaylistRepository for SpotifyPlaylistRepository<'a> {
     ) -> PlaylistRepositoryResult<Vec<TrackWithAlbumAndArtists>> {
         let url = match playlist_id {
             PlaylistId::LikedSongs => format!("{}/me/tracks", API_URL),
-            PlaylistId::Owned(pid) => format!("{}/playlist/{}", API_URL, pid),
+            PlaylistId::Owned(spotify_id) => format!("{}/playlist/{}", API_URL, spotify_id),
         };
 
         let response = self.http_client.get(url).send().await.map_err(|err| {

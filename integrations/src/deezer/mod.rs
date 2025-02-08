@@ -228,7 +228,7 @@ impl<'a> PlaylistRepository for DeezerPlaylistRepository<'a> {
         }
     }
 
-    async fn delete(&self, playlist_id: &PlaylistId) -> PlaylistRepositoryResult<Playlist> {
+    async fn delete(&self, playlist_id: &PlaylistId) -> PlaylistRepositoryResult<Option<Playlist>> {
         match playlist_id {
             PlaylistId::LikedSongs => Err(PlaylistRepositoryError::ServiceError(
                 "operation not permitted with favourite tracks list".to_string(),
@@ -254,7 +254,7 @@ impl<'a> PlaylistRepository for DeezerPlaylistRepository<'a> {
                                 ))
                             }
                             DeezerResponse::Playlist(deezer_playlist) => {
-                                Ok((*deezer_playlist).into())
+                                Ok(Some((*deezer_playlist).into()))
                             }
                             _ => Err(PlaylistRepositoryError::ServiceError(
                                 "bad response format".to_string(),
