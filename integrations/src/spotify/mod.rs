@@ -1,4 +1,4 @@
-use std::{collections::HashSet, time::Duration};
+use std::{collections::{HashMap, HashSet}, time::Duration};
 
 use common::SpotifyList;
 use playlist::{SpotifyPlaylist, SpotifySimplifiedPlaylist};
@@ -32,11 +32,15 @@ pub struct SpotifyPlaylistRepository<'a> {
     http_client: Client,
     #[allow(dead_code)]
     music_account_provider: &'a MusicAccountProvider,
+    // TODO Might chant that to metadata of current connected account
+    /// Username of the Spotify account connected
+    username: String,
 }
 
 impl<'a> SpotifyPlaylistRepository<'a> {
     pub fn new(
         music_account_provider: &'a MusicAccountProvider,
+        username: String,
         access_token: String,
     ) -> Result<Self, &'static str> {
         let mut default_headers = HeaderMap::new();
@@ -59,6 +63,7 @@ impl<'a> SpotifyPlaylistRepository<'a> {
                     eprintln!("{:?}", err);
                     "DeezerPlaylistRepository::new: Could not init HTTP client"
                 })?,
+            username,
             music_account_provider,
         })
     }
@@ -177,7 +182,42 @@ impl<'a> PlaylistRepository for SpotifyPlaylistRepository<'a> {
     }
 
     async fn create(&self, name: &str) -> PlaylistRepositoryResult<Playlist> {
-        todo!()
+        let url = format!("{}/user/{}/playlists", API_URL, self.username);
+
+        let mut body: HashMap<&str, &str> = HashMap::new();
+        
+        body.insert("name", name);
+        body.insert("description", "Playlist created thanks SonikSwap");
+
+        let response = self
+            .http_client
+            .post(url)
+            .json(&body)
+            .send()
+            .await
+            .map_err(|err| {
+                PlaylistRepositoryError::ServiceError(format!(
+                    "PlaylistRepository - Failed to send request - {:?}",
+                    err
+                ))
+            })?;
+
+        match response.error_for_status() {
+            Ok(res) => {
+                let playlist = res.json::<SpotifyPlaylist>().await.map_err(|err| {
+                    PlaylistRepositoryError::ServiceError(format!(
+                        "PlaylistRepository - Failed to parse response - {:?}",
+                        err
+                    ))
+                })?;
+
+                Ok(playlist.into())
+            },
+            Err(err) => Err(PlaylistRepositoryError::ServiceError(format!(
+                "PlaylistRepository - Error during request - {:?}",
+                err
+            )))
+        }
     }
 
     async fn delete(&self, id: &PlaylistId) -> PlaylistRepositoryResult<Playlist> {
