@@ -53,8 +53,8 @@ impl PlaylistRepository for DummyPlaylistRepository {
         ))
     }
 
-    async fn delete(&self, id: &PlaylistId) -> PlaylistRepositoryResult<Playlist> {
-        Ok(Playlist::new(
+    async fn delete(&self, id: &PlaylistId) -> PlaylistRepositoryResult<Option<Playlist>> {
+        Ok(Some(Playlist::new(
             id.clone(),
             String::from("Emo"),
             HashSet::new(),
@@ -63,13 +63,14 @@ impl PlaylistRepository for DummyPlaylistRepository {
             "https://www.deezer.com/us/playlist/9701198282"
                 .parse()
                 .unwrap(),
-        ))
+        )))
     }
 
     async fn add_tracks(
         &self,
         _playlist_id: &PlaylistId,
         _ids: &[String],
+        _snapshot_id: Option<String>,
     ) -> PlaylistRepositoryResult<()> {
         Ok(())
     }
@@ -78,6 +79,7 @@ impl PlaylistRepository for DummyPlaylistRepository {
         &self,
         _playlist_id: &PlaylistId,
         _ids: &[String],
+        _snapshot_id: Option<String>,
     ) -> PlaylistRepositoryResult<()> {
         Ok(())
     }
@@ -113,9 +115,6 @@ impl PlaylistRepository for DummyPlaylistRepository {
                         (ProviderId::new(String::from("deezer")), String::from("deezer_artist_id"))
                     ]),
                     String::from("Khelani"),
-                    HashSet::from_iter([
-                        ImageCover::Sm(Url::parse("https://cdn-images.dzcdn.net/images/artist/2bf1fa3d1cc1716f784dadf112d16d9e/500x500-000000-80-0-0.jpg").unwrap())
-                    ]),
                     HashMap::from_iter([
                         (ProviderId::new(String::from("deezer")), Url::parse("https://www.deezer.com/us/artist/5603027").unwrap())
                     ])
