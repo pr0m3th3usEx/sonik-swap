@@ -6,7 +6,11 @@ import CreatePlaylistModal from '../modals/create-playlist-modal';
 import AddIcon from '@/lib/theme/assets/icons/add.svg';
 import { Button } from '../ui/button';
 
-export default function PlaylistMenuAction({ provider }: { provider: string }) {
+export default function PlaylistMenuAction({
+  provider: _provider,
+}: {
+  provider: string;
+}) {
   const [open, setOpen] = useState(false);
 
   return (
