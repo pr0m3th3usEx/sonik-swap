@@ -42,17 +42,14 @@ pub struct DeezerArtist {
 
 #[cfg(test)]
 mod tests {
-    use super::{DeezerIdType, DeezerArtist};
+    use super::{DeezerArtist, DeezerIdType};
 
     #[test]
     pub fn test_deserialize_artist() {
-        let json_str = include_str!("../../tests/payloads/test_artist.json");
+        let json_str = include_str!("../../tests/deezer/payload_artist.json");
         let json = serde_json::from_str::<DeezerArtist>(&json_str).expect("valid json");
 
         assert_eq!(json.name, "NewJeans");
-        assert_eq!(
-            json.id,
-            DeezerIdType::IdString("178008437".to_string())
-        );
+        assert_eq!(json.id, DeezerIdType::IdString("178008437".to_string()));
     }
 }

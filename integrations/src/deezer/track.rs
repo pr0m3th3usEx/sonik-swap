@@ -193,34 +193,6 @@ fn get_artists(reduced_artists: Vec<ReducedArtist>) -> Result<Vec<Artist>, &'sta
                 return Err("artist.name is missing");
             };
 
-            let Some(picture_default) = reduced.picture else {
-                return Err("artist.picture is missing");
-            };
-
-            let Some(picture_small) = reduced.picture_small else {
-                return Err("artist.picture_small is missing");
-            };
-
-            let Some(picture_medium) = reduced.picture_medium else {
-                return Err("artist.picture_medium is missing");
-            };
-
-            let Some(picture_big) = reduced.picture_big else {
-                return Err("artist.picture_big is missing");
-            };
-
-            let Some(picture_xl) = reduced.picture_xl else {
-                return Err("artist.picture_xl is missing");
-            };
-
-            let mut pictures = HashSet::new();
-
-            pictures.insert(ImageCover::Default(picture_default));
-            pictures.insert(ImageCover::Sm(picture_small));
-            pictures.insert(ImageCover::Md(picture_medium));
-            pictures.insert(ImageCover::Lg(picture_big));
-            pictures.insert(ImageCover::Other(picture_xl));
-
             let mut urls = HashMap::new();
 
             let Some(link) = reduced.link else {
@@ -229,7 +201,7 @@ fn get_artists(reduced_artists: Vec<ReducedArtist>) -> Result<Vec<Artist>, &'sta
 
             urls.insert(ProviderId::new("deezer".to_string()), link);
 
-            Ok(Artist::new(ids, name, pictures, urls))
+            Ok(Artist::new(ids, name, urls))
         })
         .collect::<Result<_, _>>()
 }
@@ -240,7 +212,7 @@ mod tests {
 
     #[test]
     pub fn test_deserialize_playlist() {
-        let json_str = include_str!("../../tests/payloads/test_track.json");
+        let json_str = include_str!("../../tests/deezer/payload_track.json");
         let json = serde_json::from_str::<DeezerTrack>(&json_str).expect("valid json");
 
         assert_eq!(json.title, "How Sweet");

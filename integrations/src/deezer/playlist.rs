@@ -87,7 +87,7 @@ mod tests {
 
     #[test]
     pub fn test_deserialize_playlist() {
-        let json_str = include_str!("../../tests/payloads/test_playlist.json");
+        let json_str = include_str!("../../tests/deezer/payload_playlist.json");
         let json = serde_json::from_str::<DeezerPlaylist>(&json_str).expect("valid json");
 
         assert_eq!(json.title, "Women of Rap");

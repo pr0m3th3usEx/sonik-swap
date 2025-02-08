@@ -22,7 +22,7 @@ pub trait PlaylistRepository {
 
     async fn create(&self, name: &str) -> PlaylistRepositoryResult<Playlist>;
 
-    async fn delete(&self, id: &PlaylistId) -> PlaylistRepositoryResult<Playlist>;
+    async fn delete(&self, id: &PlaylistId) -> PlaylistRepositoryResult<Option<Playlist>>;
 
     // Tracks related
 
@@ -30,12 +30,14 @@ pub trait PlaylistRepository {
         &self,
         playlist_id: &PlaylistId,
         ids: &[String],
+        snapshot_id: Option<String>,
     ) -> PlaylistRepositoryResult<()>;
 
     async fn delete_tracks(
         &self,
         playlist_id: &PlaylistId,
         ids: &[String],
+        snapshot_id: Option<String>,
     ) -> PlaylistRepositoryResult<()>;
 
     async fn get_tracks(

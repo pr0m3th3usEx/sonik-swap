@@ -2,7 +2,8 @@ use snk_core::{
     contracts::repositories::music_account_provider_repository::{
         MusicAccountProviderRepository, MusicAccountProviderRepositoryResult,
     },
-    entities::music_account_provider::MusicAccountProvider, value_objects::provider::provider_id::ProviderId,
+    entities::music_account_provider::MusicAccountProvider,
+    value_objects::provider::provider_id::ProviderId,
 };
 use uuid::Uuid;
 
