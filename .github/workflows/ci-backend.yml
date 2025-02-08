@@ -14,6 +14,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          rust-version: 1.84.1
       - run: cargo fmt --all -- --check
       - run: cargo clippy --all-features -- -D warnings
 
@@ -24,6 +26,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          rust-version: 1.84.1
       - run: cargo build
 
   test:
@@ -33,4 +37,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          rust-version: 1.84.1
+
       - run: cargo test --all-features

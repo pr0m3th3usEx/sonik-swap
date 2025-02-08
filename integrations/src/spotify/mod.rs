@@ -73,7 +73,7 @@ impl<'a> SpotifyPlaylistRepository<'a> {
     }
 }
 
-impl<'a> PlaylistRepository for SpotifyPlaylistRepository<'a> {
+impl PlaylistRepository for SpotifyPlaylistRepository<'_> {
     async fn get(&self, id: &PlaylistId) -> PlaylistRepositoryResult<Option<Playlist>> {
         let url = match id {
             PlaylistId::LikedSongs => format!("{}/me/tracks", API_URL),
