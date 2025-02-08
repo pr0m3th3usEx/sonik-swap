@@ -1,7 +1,10 @@
 use std::collections::HashSet;
 
 use serde::Deserialize;
-use snk_core::{entities::playlist::Playlist, value_objects::{image_cover::ImageCover, playlist_id::PlaylistId}};
+use snk_core::{
+    entities::playlist::Playlist,
+    value_objects::{image_cover::ImageCover, playlist_id::PlaylistId},
+};
 use url::Url;
 
 use super::{
@@ -38,7 +41,6 @@ pub struct SpotifyPlaylistTracks {
     pub total: u32,
     pub items: Vec<SpotifyPlaylistTrack>,
 }
-
 
 #[derive(Debug, Deserialize)]
 pub struct SpotifySimplifiedPlaylistTracks {
@@ -84,7 +86,7 @@ impl From<SpotifySimplifiedPlaylist> for Playlist {
         let total_songs = spotify_playlist.tracks.total;
         let provider_url = spotify_playlist.external_urls.spotify;
         let mut covers: HashSet<ImageCover> = HashSet::new();
-        
+
         // The array may be empty or contain up to three images. The images are returned by size in descending order
         let mut iter = spotify_playlist.images.into_iter();
 
@@ -104,15 +106,7 @@ impl From<SpotifySimplifiedPlaylist> for Playlist {
             covers.insert(ImageCover::Sm(image.url));
         }
 
-
-        Playlist::new(
-            playlist_id,
-            name,
-            covers,
-            owner,
-            total_songs,
-            provider_url,
-        )
+        Playlist::new(playlist_id, name, covers, owner, total_songs, provider_url)
     }
 }
 
@@ -159,7 +153,7 @@ impl From<SpotifyPlaylist> for Playlist {
         let total_songs = spotify_playlist.tracks.total;
         let provider_url = spotify_playlist.external_urls.spotify;
         let mut covers: HashSet<ImageCover> = HashSet::new();
-        
+
         // The array may be empty or contain up to three images. The images are returned by size in descending order
         let mut iter = spotify_playlist.images.into_iter();
 
@@ -179,15 +173,7 @@ impl From<SpotifyPlaylist> for Playlist {
             covers.insert(ImageCover::Sm(image.url));
         }
 
-
-        Playlist::new(
-            playlist_id,
-            name,
-            covers,
-            owner,
-            total_songs,
-            provider_url,
-        )
+        Playlist::new(playlist_id, name, covers, owner, total_songs, provider_url)
     }
 }
 

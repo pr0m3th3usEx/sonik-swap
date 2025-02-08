@@ -342,13 +342,14 @@ impl<'a> PlaylistRepository for SpotifyPlaylistRepository<'a> {
                             err
                         ))
                     })?
-
-            },
+            }
             PlaylistId::Owned(spotify_id) => {
                 let url = format!("{}/playlists/{}/tracks", API_URL, spotify_id);
                 let uris = ids
                     .iter()
-                    .map(|id| SpotifyUri { uri: format!("spotify:track:{}", id) })
+                    .map(|id| SpotifyUri {
+                        uri: format!("spotify:track:{}", id),
+                    })
                     .collect::<Vec<_>>();
 
                 self.http_client
@@ -365,7 +366,7 @@ impl<'a> PlaylistRepository for SpotifyPlaylistRepository<'a> {
                             err
                         ))
                     })?
-            },
+            }
         };
 
         match response.error_for_status() {
