@@ -12,8 +12,8 @@ impl UserRepository for DummyUserRepository {
         Ok(user)
     }
 
-    async fn update(&self, user: User) -> UserRepositoryResult<User> {
-        Ok(user)
+    async fn update(&self, _old: User, new: User) -> UserRepositoryResult<User> {
+        Ok(new)
     }
 
     async fn get(&self, user_id: Uuid) -> UserRepositoryResult<Option<User>> {
@@ -46,7 +46,18 @@ impl UserRepository for DummyUserRepository {
         )])
     }
 
-    async fn delete(&self, user: User) -> UserRepositoryResult<User> {
-        Ok(user)
+    async fn delete(&self, user_id: Uuid) -> UserRepositoryResult<User> {
+        Ok(User::new(
+            user_id,
+            String::from("dummy@test.test"),
+            true,
+            String::from("hashed_password"),
+            DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
+                .unwrap()
+                .into(),
+            DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
+                .unwrap()
+                .into()
+        ))
     }
 }

@@ -14,13 +14,13 @@ pub type UserRepositoryResult<T> = Result<T, UserRepositoryError>;
 pub trait UserRepository {
     async fn add(&self, user: User) -> UserRepositoryResult<User>;
 
-    async fn update(&self, user: User) -> UserRepositoryResult<User>;
+    async fn update(&self, old: User, new: User) -> UserRepositoryResult<User>;
 
     async fn get(&self, user_id: Uuid) -> UserRepositoryResult<Option<User>>;
 
     async fn get_all(&self) -> UserRepositoryResult<Vec<User>>;
 
-    async fn delete(&self, user: User) -> UserRepositoryResult<User>;
+    async fn delete(&self, user_id: Uuid) -> UserRepositoryResult<User>;
 }
 
 // Database implementation of users

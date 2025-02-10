@@ -1,5 +1,6 @@
 use chrono::{DateTime, Utc};
 
+#[derive(Debug, Clone, PartialEq)]
 pub struct EmailVerificationToken {
     pub user_id: String,
     pub token: String,
