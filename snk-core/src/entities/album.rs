@@ -8,11 +8,11 @@ use crate::value_objects::{
 };
 
 pub struct Album {
-    ids: HashSet<ProductId>,
-    name: String,
-    release_date: DateTime<Utc>,
-    covers: HashSet<ImageCover>,
-    provider_urls: HashMap<ProviderId, Url>,
+    pub ids: HashSet<ProductId>,
+    pub name: String,
+    pub release_date: DateTime<Utc>,
+    pub covers: HashSet<ImageCover>,
+    pub provider_urls: HashMap<ProviderId, Url>,
 }
 
 impl Album {

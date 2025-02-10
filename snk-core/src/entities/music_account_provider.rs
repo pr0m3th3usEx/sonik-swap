@@ -4,12 +4,12 @@ use crate::value_objects::provider::provider_id::ProviderId;
 
 #[derive(Hash)]
 pub struct MusicAccountProvider {
-    id: ProviderId,                     // Sonik Swap Provider ID
-    name: String,                       // Name of the platform
-    color: String,                      // # Hex decimal color
-    base_url: Url,                      // OAuth2 Base URL
-    token_url: Url,                     // OAuth2 Token URL
-    authorizations_needed: Vec<String>, // Authorization needed for OAuth scope (Ex: manage_library)
+    pub id: ProviderId,                     // Sonik Swap Provider ID
+    pub name: String,                       // Name of the platform
+    pub color: String,                      // # Hex decimal color
+    pub base_url: Url,                      // OAuth2 Base URL
+    pub token_url: Url,                     // OAuth2 Token URL
+    pub authorizations_needed: Vec<String>, // Authorization needed for OAuth scope (Ex: manage_library)
 }
 
 impl MusicAccountProvider {

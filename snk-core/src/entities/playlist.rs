@@ -6,12 +6,12 @@ use crate::value_objects::{image_cover::ImageCover, playlist_id::PlaylistId};
 
 #[derive(Debug)]
 pub struct Playlist {
-    id: PlaylistId,
-    name: String,
-    covers: HashSet<ImageCover>,
-    owner: String, // Name of the owner (We won't use other metadata for now)
-    provider_url: Url,
-    total_songs: u32,
+    pub id: PlaylistId,
+    pub name: String,
+    pub covers: HashSet<ImageCover>,
+    pub owner: String, // Name of the owner (We won't use other metadata for now)
+    pub provider_url: Url,
+    pub total_songs: u32,
 }
 
 impl Playlist {

@@ -6,9 +6,9 @@ use crate::value_objects::provider::provider_id::ProviderId;
 
 #[derive(PartialEq, Eq)]
 pub struct Artist {
-    ids: HashMap<ProviderId, String>,
-    name: String,
-    provider_urls: HashMap<ProviderId, Url>,
+    pub ids: HashMap<ProviderId, String>,
+    pub name: String,
+    pub provider_urls: HashMap<ProviderId, Url>,
 }
 
 impl Artist {

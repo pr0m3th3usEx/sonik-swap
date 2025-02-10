@@ -22,3 +22,20 @@ pub trait UserRepository {
 
     async fn delete(&self, user: User) -> UserRepositoryResult<User>;
 }
+
+// Database implementation of users
+// USER
+// id: String PRIMARY KEY,
+// username: string
+// email: string
+// email_verified: boolean
+// password: string
+// created_at: timestamp
+// updated_at: timestamp
+//
+// EMAIL_VERIFICATION
+// user_id String
+// token: String UNIQUE KEY
+// consumed: boolean
+// expires_at: timestamp
+// created_at: timestamp

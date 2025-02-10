@@ -7,10 +7,10 @@ use crate::value_objects::{product_id::ProductId, provider::provider_id::Provide
 use super::{album::Album, artist::Artist};
 
 pub struct Track {
-    ids: HashSet<ProductId>, // Track ids from external databases & providers (ISRC, UPC, EAN, Provider IDs...)
-    name: String,            // Name of the track
-    duration_ms: u32,        // Duration of the track
-    provider_urls: HashMap<ProviderId, Url>, // External Provider Music URLs
+    pub ids: HashSet<ProductId>, // Track ids from external databases & providers (ISRC, UPC, EAN, Provider IDs...)
+    pub name: String,            // Name of the track
+    pub duration_ms: u32,        // Duration of the track
+    pub provider_urls: HashMap<ProviderId, Url>, // External Provider Music URLs
 }
 
 impl Track {

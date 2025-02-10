@@ -19,9 +19,11 @@ impl UserRepository for DummyUserRepository {
     async fn get(&self, user_id: Uuid) -> UserRepositoryResult<Option<User>> {
         Ok(Some(User::new(
             user_id,
-            String::from("dummy"),
             String::from("dummy@test.test"),
             String::from("hashed_password"),
+            DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
+                .unwrap()
+                .into(),
             DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
                 .unwrap()
                 .into(),
@@ -31,9 +33,11 @@ impl UserRepository for DummyUserRepository {
     async fn get_all(&self) -> UserRepositoryResult<Vec<User>> {
         Ok(vec![User::new(
             Uuid::new_v4(),
-            String::from("dummy"),
             String::from("dummy@test.test"),
             String::from("hashed_password"),
+            DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
+                .unwrap()
+                .into(),
             DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
                 .unwrap()
                 .into(),
