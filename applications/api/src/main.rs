@@ -1,4 +1,15 @@
-use axum::{routing::get, Router};
+mod routes;
+mod state;
+
+use adapters::in_memory::{
+    email_verification_repository::InMemoryEmailVerificationRepository,
+    user_repository::InMemoryUserRepository,
+};
+use axum::{
+    routing::{get, post},
+    Router,
+};
+use routes::auth::handlers as auth_handlers;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 #[tokio::main]
@@ -12,11 +23,12 @@ async fn main() {
         .with(tracing_subscriber::fmt::layer())
         .init();
 
+    // Initialize repositories
+    let user_repository = InMemoryUserRepository::default();
+    let email_verification_repository = InMemoryEmailVerificationRepository::default();
+
     // TODO API routes
-    //
-    // - GET  /auth/{providerId}: Return OAuth2 authentication URL + ?=state=providerId
-    // - GET  /auth/callback: FindOrCreate user account
-    //
+
     // - GET  /user/me: Current logged in user information
     // - POST /user/tracks: Add tracks in user liked/favourite tracks
     // - DELETE /user/tracks: Delete tracks in user liked/favourite tracks
@@ -34,9 +46,49 @@ async fn main() {
     // - POST   /providers/{providerType}/playlist/{playlistId}/tracks : Add tracks to playlist
     // - DELETE /providers/{providerType}/playlist/{playlistId}/tracks : Delete tracks from playlist
 
-    let app = Router::new().route("/", get(health));
+    let auth_routes =
+        Router::new()
+            .route(
+                "/api/auth/login",
+                post(
+                    auth_handlers::login::<
+                        InMemoryUserRepository,
+                        InMemoryEmailVerificationRepository,
+                    >,
+                ),
+            )
+            .route(
+                "/api/auth/signup",
+                post(
+                    auth_handlers::signup::<
+                        InMemoryUserRepository,
+                        InMemoryEmailVerificationRepository,
+                    >,
+                ),
+            );
+    // .route(
+    //     "/api/auth/oauth2",
+    //     get(auth_handlers::oauth2::<
+    //         InMemoryUserRepository,
+    //         InMemoryEmailVerificationRepository,
+    //     >),
+    // )
+    // .route(
+    //     "/api/auth/oauth2/callback",
+    //     get(auth_handlers::oauth2::<
+    //         InMemoryUserRepository,
+    //         InMemoryEmailVerificationRepository,
+    //     >),
+    // );
 
-    // TODO import from environment (PORT, HOST)
+    let app = Router::new()
+        .route("/api", get(health))
+        .nest("/api", auth_routes)
+        .with_state(state::AppState {
+            user_repo: user_repository,
+            email_verification_repo: email_verification_repository,
+        });
+
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000")
         .await
         .expect("TCPListener: Could not bind port");

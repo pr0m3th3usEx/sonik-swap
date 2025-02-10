@@ -58,6 +58,7 @@ dependencies = [
 name = "api"
 version = "0.1.0"
 dependencies = [
+ "adapters",
  "axum",
  "snk-core",
  "tokio",

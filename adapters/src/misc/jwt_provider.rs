@@ -36,7 +36,7 @@ impl TokenProvider for JwtProvider {
         T: serde::de::DeserializeOwned + Default,
     {
         let result = jsonwebtoken::decode::<T>(
-            &token,
+            token,
             &DecodingKey::from_base64_secret(&self.secret)
                 .map_err(|e| TokenProviderError::InternalError(e.to_string()))?,
             &Validation::default(),

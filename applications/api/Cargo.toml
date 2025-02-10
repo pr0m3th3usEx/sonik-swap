@@ -12,3 +12,6 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
 # Business core
 snk-core.workspace = true
+
+# Adapters
+adapters.workspace = true

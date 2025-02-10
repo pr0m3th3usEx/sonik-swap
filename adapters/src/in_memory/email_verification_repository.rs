@@ -6,9 +6,17 @@ use snk_core::{
     },
     entities::email_verification::EmailVerificationToken,
 };
-
+#[derive(Clone)]
 pub struct InMemoryEmailVerificationRepository {
     email_tokens: Arc<RwLock<Vec<EmailVerificationToken>>>,
+}
+
+impl Default for InMemoryEmailVerificationRepository {
+    fn default() -> Self {
+        InMemoryEmailVerificationRepository {
+            email_tokens: Arc::new(RwLock::new(Vec::new())),
+        }
+    }
 }
 
 impl EmailVerificationRepository for InMemoryEmailVerificationRepository {
@@ -60,9 +68,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_add() {
-        let repo = InMemoryEmailVerificationRepository {
-            email_tokens: Arc::new(RwLock::new(Vec::new())),
-        };
+        let repo = InMemoryEmailVerificationRepository::default();
 
         let user_id = "user_id".to_string();
         let token = "token".to_string();
@@ -84,9 +90,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_get() {
-        let repo = InMemoryEmailVerificationRepository {
-            email_tokens: Arc::new(RwLock::new(Vec::new())),
-        };
+        let repo = InMemoryEmailVerificationRepository::default();
 
         let user_id = "user_id".to_string();
         let token = "token".to_string();
@@ -111,9 +115,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_update() {
-        let repo = InMemoryEmailVerificationRepository {
-            email_tokens: Arc::new(RwLock::new(Vec::new())),
-        };
+        let repo = InMemoryEmailVerificationRepository::default();
 
         let user_id = "user_id".to_string();
         let token = "token".to_string();

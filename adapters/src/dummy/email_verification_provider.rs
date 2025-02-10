@@ -6,13 +6,8 @@ use snk_core::{
     entities::email_verification::EmailVerificationToken,
 };
 
+#[derive(Default)]
 pub struct DummyEmailVerificationRepository {}
-
-impl DummyEmailVerificationRepository {
-    pub fn new() -> Self {
-        Self {}
-    }
-}
 
 impl EmailVerificationRepository for DummyEmailVerificationRepository {
     async fn add(

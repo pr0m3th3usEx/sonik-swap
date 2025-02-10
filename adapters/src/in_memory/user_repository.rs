@@ -3,12 +3,13 @@ use std::sync::{Arc, RwLock};
 use snk_core::{contracts::repositories::user_repository::{UserRepository, UserRepositoryError, UserRepositoryResult}, entities::user::User};
 use uuid::Uuid;
 
+#[derive(Clone)]
 pub struct InMemoryUserRepository {
     users: Arc<RwLock<Vec<User>>>,
 }
 
-impl InMemoryUserRepository {
-    pub fn new() -> Self {
+impl Default for InMemoryUserRepository {
+    fn default() -> Self {
         InMemoryUserRepository {
             users: Arc::new(RwLock::new(Vec::new())),
         }
@@ -78,7 +79,7 @@ mod tests {
     #[tokio::test]
     async fn test_add_user() {
         // Arrange
-        let repository = InMemoryUserRepository::new();
+        let repository = InMemoryUserRepository::default();
         let user = User::new(
             Uuid::new_v4(),
             String::from("dummy@test.test"),
@@ -100,7 +101,7 @@ mod tests {
     #[tokio::test]
     async fn test_get_user() {
         // Arrange
-        let repository = InMemoryUserRepository::new();
+        let repository = InMemoryUserRepository::default();
         let user = User::new(
             Uuid::new_v4(),
             String::from("dummy@test.test"),
@@ -122,7 +123,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_delete_user() {
-        let repository = InMemoryUserRepository::new();
+        let repository = InMemoryUserRepository::default();
         let user = User::new(
             Uuid::new_v4(),
             String::from("dummy@test.test"),
@@ -145,7 +146,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_get_all_users() {
-        let repository = InMemoryUserRepository::new();
+        let repository = InMemoryUserRepository::default();
         let user = User::new(
             Uuid::new_v4(),
             String::from("dummy@test.test"),
@@ -167,7 +168,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_update_user() {
-        let repository = InMemoryUserRepository::new();
+        let repository = InMemoryUserRepository::default();
         let user = User::new(
             Uuid::new_v4(),
             String::from("dummy@test.test"),
