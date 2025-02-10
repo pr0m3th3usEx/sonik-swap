@@ -20,6 +20,7 @@ impl UserRepository for DummyUserRepository {
         Ok(Some(User::new(
             user_id,
             String::from("dummy@test.test"),
+            true,
             String::from("hashed_password"),
             DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
                 .unwrap()
@@ -34,6 +35,7 @@ impl UserRepository for DummyUserRepository {
         Ok(vec![User::new(
             Uuid::new_v4(),
             String::from("dummy@test.test"),
+            true,
             String::from("hashed_password"),
             DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
                 .unwrap()

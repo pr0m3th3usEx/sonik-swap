@@ -1,5 +1,4 @@
 [workspace]
-name = "sonik-swap"
 resolver = '2'
 
 members = ["adapters", "applications/api", "integrations", "snk-core"]

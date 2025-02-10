@@ -4,6 +4,7 @@ use uuid::Uuid;
 pub struct User {
     pub id: Uuid,
     pub email: String,
+    pub email_verified: bool,
     pub password: String,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
@@ -13,6 +14,7 @@ impl User {
     pub fn new(
         id: Uuid,
         email: String,
+        email_verified: bool,
         password: String,
         created_at: DateTime<Utc>,
         updated_at: DateTime<Utc>,
@@ -20,6 +22,7 @@ impl User {
         Self {
             id,
             email,
+            email_verified,
             password,
             created_at,
             updated_at,
@@ -28,6 +31,10 @@ impl User {
 
     pub fn id(&self) -> Uuid {
         self.id
+    }
+
+    pub fn email_verified(&self) -> bool {
+        self.email_verified
     }
 
     pub fn email(&self) -> &String {

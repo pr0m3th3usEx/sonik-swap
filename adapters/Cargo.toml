@@ -5,7 +5,12 @@ edition = "2021"
 
 [dependencies]
 snk-core.workspace = true
-
 uuid.workspace = true
 chrono.workspace = true
 url.workspace = true
+serde.workspace = true
+tokio.workspace = true
+
+# Providers
+
+jsonwebtoken = "9.3.1"

@@ -1,3 +1,5 @@
+use chrono::{DateTime, Utc};
+
 pub struct EmailVerificationToken {
     pub user_id: String,
     pub token: String,

@@ -1,8 +1,11 @@
-use chrono::{DateTime, Utc};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum TokenProviderError {
+    #[error("ExpiredToken")]
+    ExpiredToken,
+    #[error("InvalidToken: {0}")]
+    InvalidToken(String),
     #[error("InternalError: {0}")]
     InternalError(String),
 }
@@ -13,13 +16,11 @@ pub trait TokenProvider {
     async fn generate_token<T>(
         &self,
         claims: T,
-        expiration: DateTime<Utc>,
-        secret: String,
     ) -> TokenProviderResult<String>
     where
         T: serde::Serialize;
 
-    async fn verify_token<T>(&self, token: &str, secret: String) -> TokenProviderResult<T>
+    async fn verify_token<T>(&self, token: &str) -> TokenProviderResult<T>
     where
-        T: serde::de::DeserializeOwned;
+        T: serde::de::DeserializeOwned + Default;
 }
