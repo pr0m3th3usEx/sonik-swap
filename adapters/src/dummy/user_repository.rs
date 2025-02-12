@@ -22,14 +22,30 @@ impl UserRepository for DummyUserRepository {
             String::from("dummy@test.test"),
             true,
             String::from("hashed_password"),
-            DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
+            Some(DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
                 .unwrap()
-                .into(),
-            DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
+                .into()),
+            Some(DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
                 .unwrap()
-                .into(),
+                .into()),
         )))
     }
+
+    async fn get_from_email(&self, email: &str) -> UserRepositoryResult<Option<User>> {
+        Ok(Some(User::new(
+            Uuid::new_v4(),
+            String::from(email),
+            true,
+            String::from("hashed_password"),
+            Some(DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
+                .unwrap()
+                .into()),
+            Some(DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
+                .unwrap()
+                .into()),
+        )))
+    }
+
 
     async fn get_all(&self) -> UserRepositoryResult<Vec<User>> {
         Ok(vec![User::new(
@@ -37,12 +53,12 @@ impl UserRepository for DummyUserRepository {
             String::from("dummy@test.test"),
             true,
             String::from("hashed_password"),
-            DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
+            Some(DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
                 .unwrap()
-                .into(),
-            DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
+                .into()),
+            Some(DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
                 .unwrap()
-                .into(),
+                .into()),
         )])
     }
 
@@ -52,12 +68,12 @@ impl UserRepository for DummyUserRepository {
             String::from("dummy@test.test"),
             true,
             String::from("hashed_password"),
-            DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
+            Some(DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
                 .unwrap()
-                .into(),
-            DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
+                .into()),
+            Some(DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
                 .unwrap()
-                .into()
+                .into())
         ))
     }
 }

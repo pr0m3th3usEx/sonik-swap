@@ -18,6 +18,8 @@ pub trait UserRepository {
 
     async fn get(&self, user_id: Uuid) -> UserRepositoryResult<Option<User>>;
 
+    async fn get_from_email(&self, email: &str) -> UserRepositoryResult<Option<User>>;
+
     async fn get_all(&self) -> UserRepositoryResult<Vec<User>>;
 
     async fn delete(&self, user_id: Uuid) -> UserRepositoryResult<User>;
@@ -26,7 +28,6 @@ pub trait UserRepository {
 // Database implementation of users
 // USER
 // id: String PRIMARY KEY,
-// username: string
 // email: string
 // email_verified: boolean
 // password: string

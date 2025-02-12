@@ -46,6 +46,12 @@ impl UserRepository for InMemoryUserRepository {
 
         Ok(store.iter().find(|u| u.id == user_id).cloned())
     }
+    
+    async fn get_from_email(&self, email: &str) -> UserRepositoryResult<Option<User>> {
+        let store = self.users.read().expect("lock poisoned");
+
+        Ok(store.iter().find(|u| u.email == email).cloned())
+    }
 
     async fn get_all(&self) -> UserRepositoryResult<Vec<User>> {
         let store = self.users.read().expect("lock poisoned");
@@ -85,12 +91,12 @@ mod tests {
             String::from("dummy@test.test"),
             true,
             String::from("hashed_password"),
-            DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
+            Some(DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
                 .unwrap()
-                .into(),
-            DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
+                .into()),
+            Some(DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
                 .unwrap()
-                .into(),
+                .into()),
         );
 
         let result = repository.add(user.clone()).await.unwrap();
@@ -107,16 +113,39 @@ mod tests {
             String::from("dummy@test.test"),
             true,
             String::from("hashed_password"),
-            DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
+            Some(DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
                 .unwrap()
-                .into(),
-            DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
+                .into()),
+            Some(DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
                 .unwrap()
-                .into(),
+                .into()),
         );
 
         let _ = repository.add(user.clone()).await.unwrap();
         let result = repository.get(user.id).await.unwrap();
+
+        assert_eq!(result, Some(user));
+    }
+
+    #[tokio::test]
+    async fn test_get_user_from_email() {
+        // Arrange
+        let repository = InMemoryUserRepository::default();
+        let user = User::new(
+            Uuid::new_v4(),
+            String::from("dummy@test.test"),
+            true,
+            String::from("hashed_password"),
+            Some(DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
+                .unwrap()
+                .into()),
+            Some(DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
+                .unwrap()
+                .into()),
+        );
+
+        let _ = repository.add(user.clone()).await.unwrap();
+        let result = repository.get_from_email("dummy@test.test").await.unwrap();
 
         assert_eq!(result, Some(user));
     }
@@ -129,12 +158,12 @@ mod tests {
             String::from("dummy@test.test"),
             true,
             String::from("hashed_password"),
-            DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
+            Some(DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
                 .unwrap()
-                .into(),
-            DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
+                .into()),
+            Some(DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
                 .unwrap()
-                .into(),
+                .into()),
         );
 
         let _ = repository.add(user.clone()).await.unwrap();
@@ -152,12 +181,12 @@ mod tests {
             String::from("dummy@test.test"),
             true,
             String::from("hashed_password"),
-            DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
+            Some(DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
                 .unwrap()
-                .into(),
-            DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
+                .into()),
+            Some(DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
                 .unwrap()
-                .into(),
+                .into()),
         );
 
         let _ = repository.add(user.clone()).await.unwrap();
@@ -174,20 +203,20 @@ mod tests {
             String::from("dummy@test.test"),
             true,
             String::from("hashed_password"),
-            DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
+            Some(DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
                 .unwrap()
-                .into(),
-            DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
+                .into()),
+            Some(DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00")
                 .unwrap()
-                .into(),
+                .into()),
         );
 
         let _ = repository.add(user.clone()).await.unwrap();
 
         let mut new = user.clone();
-        new.updated_at = DateTime::parse_from_rfc3339("2020-05-12T23:10:57+02:00")
+        new.updated_at = Some(DateTime::parse_from_rfc3339("2020-05-12T23:10:57+02:00")
             .unwrap()
-            .into();
+            .into());
 
         let result = repository.update(user.clone(), new.clone()).await.unwrap();
 

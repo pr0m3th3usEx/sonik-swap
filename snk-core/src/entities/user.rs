@@ -7,8 +7,8 @@ pub struct User {
     pub email: String,
     pub email_verified: bool,
     pub password: String,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
+    pub created_at: Option<DateTime<Utc>>,
+    pub updated_at: Option<DateTime<Utc>>,
 }
 
 impl User {
@@ -17,8 +17,8 @@ impl User {
         email: String,
         email_verified: bool,
         password: String,
-        created_at: DateTime<Utc>,
-        updated_at: DateTime<Utc>,
+        created_at: Option<DateTime<Utc>>,
+        updated_at: Option<DateTime<Utc>>,
     ) -> Self {
         Self {
             id,
@@ -46,11 +46,11 @@ impl User {
         &self.password
     }
 
-    pub fn created_at(&self) -> &DateTime<Utc> {
+    pub fn created_at(&self) -> &Option<DateTime<Utc>> {
         &self.created_at
     }
 
-    pub fn updated_at(&self) -> &DateTime<Utc> {
+    pub fn updated_at(&self) -> &Option<DateTime<Utc>> {
         &self.updated_at
     }
 }

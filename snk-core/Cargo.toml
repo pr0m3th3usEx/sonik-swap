@@ -9,3 +9,6 @@ url.workspace = true
 thiserror.workspace = true
 uuid.workspace = true
 serde.workspace = true
+
+# Logging
+tracing = "0.1.41"
