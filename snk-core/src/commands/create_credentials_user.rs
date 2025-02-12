@@ -10,11 +10,12 @@ use crate::{
         repositories::user_repository::{UserRepository, UserRepositoryError},
     },
     entities::user::User,
+    value_objects::{misc::email::Email, user::user_password::UserPassword},
 };
 
 pub struct CreateCredentialsUserCommand {
-    email: String,
-    password: String,
+    email: Email,
+    password: UserPassword,
 }
 
 #[derive(Debug, Error)]
@@ -63,14 +64,14 @@ impl CreateCredentialsUserCommand {
             return Err(CreateCredentialsUserCommandError::EmailAlreadyExists);
         }
 
-        // Hash password
-        let hashed_password = password_provider.hash_password(&self.password).await?;
+        let user_id = id_provider.generate();
+        let hashed_password = UserPassword::from_hash(
+            password_provider.hash_password(self.password.as_ref()).await?
+        );
 
         // Add user to database
-
         let user_to_create = User::new(
-            // TODO Replace by controlled ID in value objects
-            id_provider.generate(),
+            user_id,
             self.email,
             false,
             hashed_password,

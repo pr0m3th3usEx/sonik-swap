@@ -1,24 +1,26 @@
-use chrono::{DateTime, Utc};
-use uuid::Uuid;
+use crate::value_objects::{
+    misc::{date::Date, email::Email},
+    user::{user_id::UserId, user_password::UserPassword},
+};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct User {
-    pub id: Uuid,
-    pub email: String,
+    pub id: UserId,
+    pub email: Email,
     pub email_verified: bool,
-    pub password: String,
-    pub created_at: Option<DateTime<Utc>>,
-    pub updated_at: Option<DateTime<Utc>>,
+    pub password: UserPassword,
+    pub created_at: Option<Date>,
+    pub updated_at: Option<Date>,
 }
 
 impl User {
     pub fn new(
-        id: Uuid,
-        email: String,
+        id: UserId,
+        email: Email,
         email_verified: bool,
-        password: String,
-        created_at: Option<DateTime<Utc>>,
-        updated_at: Option<DateTime<Utc>>,
+        password: UserPassword,
+        created_at: Option<Date>,
+        updated_at: Option<Date>,
     ) -> Self {
         Self {
             id,
@@ -30,27 +32,27 @@ impl User {
         }
     }
 
-    pub fn id(&self) -> Uuid {
-        self.id
+    pub fn id(&self) -> &UserId {
+        &self.id
     }
 
     pub fn email_verified(&self) -> bool {
         self.email_verified
     }
 
-    pub fn email(&self) -> &String {
+    pub fn email(&self) -> &Email {
         &self.email
     }
 
-    pub fn password(&self) -> &String {
+    pub fn password(&self) -> &UserPassword {
         &self.password
     }
 
-    pub fn created_at(&self) -> &Option<DateTime<Utc>> {
+    pub fn created_at(&self) -> &Option<Date> {
         &self.created_at
     }
 
-    pub fn updated_at(&self) -> &Option<DateTime<Utc>> {
+    pub fn updated_at(&self) -> &Option<Date> {
         &self.updated_at
     }
 }

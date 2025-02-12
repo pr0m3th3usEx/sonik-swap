@@ -1,7 +1,6 @@
 use thiserror::Error;
-use uuid::Uuid;
 
-use crate::entities::user::User;
+use crate::{entities::user::User, value_objects::{misc::email::Email, user::user_id::UserId}};
 
 #[derive(Debug, Error)]
 pub enum UserRepositoryError {
@@ -16,13 +15,13 @@ pub trait UserRepository {
 
     async fn update(&self, old: User, new: User) -> UserRepositoryResult<User>;
 
-    async fn get(&self, user_id: Uuid) -> UserRepositoryResult<Option<User>>;
+    async fn get(&self, user_id: &UserId) -> UserRepositoryResult<Option<User>>;
 
-    async fn get_from_email(&self, email: &str) -> UserRepositoryResult<Option<User>>;
+    async fn get_from_email(&self, email: &Email) -> UserRepositoryResult<Option<User>>;
 
     async fn get_all(&self) -> UserRepositoryResult<Vec<User>>;
 
-    async fn delete(&self, user_id: Uuid) -> UserRepositoryResult<User>;
+    async fn delete(&self, user_id: &UserId) -> UserRepositoryResult<User>;
 }
 
 // Database implementation of users
