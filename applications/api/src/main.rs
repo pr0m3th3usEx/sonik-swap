@@ -5,7 +5,8 @@ pub mod utils;
 use adapters::{
     in_memory::user_repository::InMemoryUserRepository,
     misc::{
-        password_provider_prod::PasswordProviderProd, user_id_provider_prod::UserIdProviderProd,
+        jwt_provider::JwtProvider, password_provider_prod::PasswordProviderProd,
+        user_id_provider_prod::UserIdProviderProd,
     },
 };
 use axum::{
@@ -35,6 +36,16 @@ async fn main() {
     let user_repository = InMemoryUserRepository::default();
     let user_id_provider = UserIdProviderProd::default();
     let password_provider = PasswordProviderProd::default();
+    let access_token_provider = JwtProvider::new(
+        std::env::var("ACCESS_TOKEN_SECRET")
+            .expect("ACCESS_TOKEN_SECRET set")
+            .to_string(),
+    );
+    let refresh_token_provider = JwtProvider::new(
+        std::env::var("REFRESH_TOKEN_SECRET")
+            .expect("REFRESH_TOKEN_SECRET set")
+            .to_string(),
+    );
 
     // TODO API routes
 
@@ -56,8 +67,8 @@ async fn main() {
     // - DELETE /providers/{providerType}/playlist/{playlistId}/tracks : Delete tracks from playlist
 
     let auth_routes = Router::new()
-        .route("/signup", post(signup::handler::<_, _, _>))
-        .route("/login", post(login::handler::<_, _, _>));
+        .route("/signup", post(signup::handler::<_, _, _, _, _>))
+        .route("/login", post(login::handler::<_, _, _, _, _>));
 
     let app = Router::new()
         .route("/api", get(health))
@@ -67,6 +78,8 @@ async fn main() {
             user_repo: user_repository,
             user_id_provider,
             password_provider,
+            access_token_provider,
+            refresh_token_provider,
         });
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000")

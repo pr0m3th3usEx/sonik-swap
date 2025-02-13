@@ -4,3 +4,4 @@ pub mod product_id;
 pub mod provider;
 pub mod user;
 pub mod misc;
+pub mod auth;

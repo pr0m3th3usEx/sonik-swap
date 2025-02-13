@@ -1,7 +1,9 @@
 use jsonwebtoken::{errors::ErrorKind, DecodingKey, EncodingKey, Header, Validation};
 use snk_core::contracts::providers::token_provider::{TokenProvider, TokenProviderError, TokenProviderResult};
 
+#[derive(Clone)]
 pub struct JwtProvider {
+    /// base64-encoded secret passphrase
     secret: String,
 }
 

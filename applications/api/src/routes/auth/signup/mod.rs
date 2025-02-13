@@ -9,7 +9,10 @@ use snk_core::{
         CreateCredentialsUserCommand, CreateCredentialsUserCommandError,
     },
     contracts::{
-        providers::{password_provider::PasswordProvider, user_id_provider::UserIdProvider},
+        providers::{
+            password_provider::PasswordProvider, token_provider::TokenProvider,
+            user_id_provider::UserIdProvider,
+        },
         repositories::user_repository::UserRepository,
     },
 };
@@ -18,6 +21,7 @@ use crate::{state::AppState, utils::extractors::body::AppJsonBody};
 
 impl From<CreateCredentialsUserCommandError> for SignupError {
     fn from(error: CreateCredentialsUserCommandError) -> Self {
+        tracing::error!({ %error }, "Error while executing command");
         match error {
             CreateCredentialsUserCommandError::EmailAlreadyExists => Self {
                 status: StatusCode::CONFLICT.as_u16(),
@@ -32,14 +36,18 @@ impl From<CreateCredentialsUserCommandError> for SignupError {
 }
 
 /// - POST /auth/signup: Create a new user account
-pub async fn handler<UserRepo, UserIdProv, PassswordProv>(
-    State(state): State<AppState<UserRepo, UserIdProv, PassswordProv>>,
+pub async fn handler<UserRepo, UserIdProv, PassswordProv, AccessTokenProv, RefreshTokenProv>(
+    State(state): State<
+        AppState<UserRepo, UserIdProv, PassswordProv, AccessTokenProv, RefreshTokenProv>,
+    >,
     AppJsonBody(payload, _): AppJsonBody<CredentialsSignupBody, CredentialsSignupRequest>,
 ) -> Result<SignupResponse, SignupError>
 where
     UserRepo: UserRepository,
     UserIdProv: UserIdProvider,
     PassswordProv: PasswordProvider,
+    AccessTokenProv: TokenProvider,
+    RefreshTokenProv: TokenProvider,
 {
     CreateCredentialsUserCommand::new(payload.email, payload.password)
         .execute(
