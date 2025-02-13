@@ -10,7 +10,7 @@ pub enum EmailVerificationRepositoryError {
 
 pub type EmailVerificationRepositoryResult<T> = Result<T, EmailVerificationRepositoryError>;
 
-pub trait EmailVerificationRepository {
+pub trait EmailVerificationRepository: Send + Sync {
     async fn add(
         &self,
         ev_token: EmailVerificationToken,

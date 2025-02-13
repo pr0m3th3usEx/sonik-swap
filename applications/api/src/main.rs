@@ -1,15 +1,14 @@
 mod routes;
 mod state;
+pub mod utils;
 
-use adapters::in_memory::{
-    email_verification_repository::InMemoryEmailVerificationRepository,
-    user_repository::InMemoryUserRepository,
-};
+use adapters::in_memory::user_repository::InMemoryUserRepository;
 use axum::{
     routing::{get, post},
     Router,
 };
-use routes::auth::handlers as auth_handlers;
+use routes::auth::{login, signup};
+use tower_http::trace::TraceLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 #[tokio::main]
@@ -17,7 +16,7 @@ async fn main() {
     tracing_subscriber::registry()
         .with(
             tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| {
-                format!("{}=debug,tower_http=debug", env!("CARGO_CRATE_NAME")).into()
+                format!("{}=debug,tower_http=debug,snk_core=debug", env!("CARGO_CRATE_NAME")).into()
             }),
         )
         .with(tracing_subscriber::fmt::layer())
@@ -25,7 +24,6 @@ async fn main() {
 
     // Initialize repositories
     let user_repository = InMemoryUserRepository::default();
-    let email_verification_repository = InMemoryEmailVerificationRepository::default();
 
     // TODO API routes
 
@@ -46,47 +44,19 @@ async fn main() {
     // - POST   /providers/{providerType}/playlist/{playlistId}/tracks : Add tracks to playlist
     // - DELETE /providers/{providerType}/playlist/{playlistId}/tracks : Delete tracks from playlist
 
-    let auth_routes =
-        Router::new()
-            .route(
-                "/api/auth/login",
-                post(
-                    auth_handlers::login::<
-                        InMemoryUserRepository,
-                        InMemoryEmailVerificationRepository,
-                    >,
-                ),
-            )
-            .route(
-                "/api/auth/signup",
-                post(
-                    auth_handlers::signup::<
-                        InMemoryUserRepository,
-                        InMemoryEmailVerificationRepository,
-                    >,
-                ),
-            );
-    // .route(
-    //     "/api/auth/oauth2",
-    //     get(auth_handlers::oauth2::<
-    //         InMemoryUserRepository,
-    //         InMemoryEmailVerificationRepository,
-    //     >),
-    // )
-    // .route(
-    //     "/api/auth/oauth2/callback",
-    //     get(auth_handlers::oauth2::<
-    //         InMemoryUserRepository,
-    //         InMemoryEmailVerificationRepository,
-    //     >),
-    // );
+    let auth_routes = Router::new()
+        .route(
+            "/signup",
+            post(signup::handler::<InMemoryUserRepository>),
+        )
+        .route("/login", post(login::handler::<InMemoryUserRepository>));
 
     let app = Router::new()
         .route("/api", get(health))
-        .nest("/api", auth_routes)
+        .nest("/api/auth", auth_routes)
+        .layer(TraceLayer::new_for_http())
         .with_state(state::AppState {
             user_repo: user_repository,
-            email_verification_repo: email_verification_repository,
         });
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000")

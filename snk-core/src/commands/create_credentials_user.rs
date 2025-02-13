@@ -50,6 +50,10 @@ impl From<PasswordProviderError> for CreateCredentialsUserCommandError {
 }
 
 impl CreateCredentialsUserCommand {
+    pub fn new(email: Email, password: UserPassword) -> Self {
+        Self { email, password }
+    }
+
     pub async fn execute(
         self,
         user_repo: &impl UserRepository,

@@ -7,7 +7,6 @@ use snk_core::{
     entities::user::User,
     value_objects::{misc::email::Email, user::user_id::UserId},
 };
-use uuid::Uuid;
 
 #[derive(Clone)]
 pub struct InMemoryUserRepository {

@@ -10,7 +10,7 @@ pub enum UserRepositoryError {
 pub type UserRepositoryResult<T> = Result<T, UserRepositoryError>;
 
 /// Repository managing user accounts
-pub trait UserRepository {
+pub trait UserRepository: Send + Sync {
     async fn add(&self, user: User) -> UserRepositoryResult<User>;
 
     async fn update(&self, old: User, new: User) -> UserRepositoryResult<User>;
