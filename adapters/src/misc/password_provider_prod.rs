@@ -7,6 +7,7 @@ use snk_core::contracts::providers::password_provider::{
     PasswordProvider, PasswordProviderError, PasswordProviderResult,
 };
 
+#[derive(Clone)]
 pub struct PasswordProviderProd<'a> {
     engine: Argon2<'a>,
     salt_string: SaltString,
@@ -20,6 +21,12 @@ impl PasswordProviderProd<'_> {
             salt_string,
             engine: Argon2::default(),
         }
+    }
+}
+
+impl Default for PasswordProviderProd<'_> {
+    fn default() -> Self {
+        Self::new(None)
     }
 }
 
