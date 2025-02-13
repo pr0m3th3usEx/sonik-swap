@@ -12,10 +12,16 @@ pub struct SignupError {
 
 impl IntoResponse for SignupError {
     fn into_response(self) -> axum::response::Response {
-        let mut response = Body::from(serde_json::to_string(&self).unwrap()).into_response();
+        let json = serde_json::to_string(&self);
+        let mut response = Body::from(()).into_response();
 
-        *response.status_mut() = StatusCode::from_u16(self.status).expect("invalid status code");
-
+        if let Ok(json) = json {
+            *response.body_mut() = Body::from(json);
+            *response.status_mut() = StatusCode::from_u16(self.status).expect("invalid status code");
+        } else {
+            *response.status_mut() = StatusCode::INTERNAL_SERVER_ERROR;
+        }
+    
         response
     }
 }
