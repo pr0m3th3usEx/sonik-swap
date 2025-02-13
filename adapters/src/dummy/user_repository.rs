@@ -22,7 +22,7 @@ impl UserRepository for DummyUserRepository {
 
     async fn get(&self, user_id: &UserId) -> UserRepositoryResult<Option<User>> {
         Ok(Some(User::new(
-            user_id.clone(),
+            *user_id,
             Email::new("dummy@test.test").unwrap(),
             true,
             UserPassword::from_hash("hashed_password"),
@@ -85,7 +85,7 @@ impl UserRepository for DummyUserRepository {
 
     async fn delete(&self, user_id: &UserId) -> UserRepositoryResult<User> {
         Ok(User::new(
-            user_id.clone(),
+            *user_id,
             Email::new("dummy@test.test").unwrap(),
             true,
             UserPassword::from_hash("hashed_password"),

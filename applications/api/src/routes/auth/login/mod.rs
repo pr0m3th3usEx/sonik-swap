@@ -3,7 +3,10 @@ mod output;
 
 use axum::{extract::State, response::IntoResponse};
 use input::{CredentialsLoginBody, CredentialsLoginRequest};
-use snk_core::contracts::{providers::{password_provider::PasswordProvider, user_id_provider::UserIdProvider}, repositories::user_repository::UserRepository};
+use snk_core::contracts::{
+    providers::{password_provider::PasswordProvider, user_id_provider::UserIdProvider},
+    repositories::user_repository::UserRepository,
+};
 
 use crate::{state::AppState, utils::extractors::body::AppJsonBody};
 

@@ -1,4 +1,8 @@
-use axum::{body::Body, http::{Response, StatusCode}, response::IntoResponse};
+use axum::{
+    body::Body,
+    http::{Response, StatusCode},
+    response::IntoResponse,
+};
 use serde::Serialize;
 
 #[derive(Default, Serialize)]
@@ -17,21 +21,22 @@ impl IntoResponse for SignupError {
 
         if let Ok(json) = json {
             *response.body_mut() = Body::from(json);
-            *response.status_mut() = StatusCode::from_u16(self.status).expect("invalid status code");
+            *response.status_mut() =
+                StatusCode::from_u16(self.status).expect("invalid status code");
         } else {
             *response.status_mut() = StatusCode::INTERNAL_SERVER_ERROR;
         }
-    
+
         response
     }
 }
 
 impl IntoResponse for SignupResponse {
-  fn into_response(self) -> axum::response::Response {
-      let mut response = Response::new(Body::from(()));
+    fn into_response(self) -> axum::response::Response {
+        let mut response = Response::new(Body::from(()));
 
-      *response.status_mut() = StatusCode::CREATED;
+        *response.status_mut() = StatusCode::CREATED;
 
-      response
-  }
+        response
+    }
 }

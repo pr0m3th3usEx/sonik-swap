@@ -2,7 +2,12 @@ mod routes;
 mod state;
 pub mod utils;
 
-use adapters::{in_memory::user_repository::InMemoryUserRepository, misc::{password_provider_prod::PasswordProviderProd, user_id_provider_prod::UserIdProviderProd}};
+use adapters::{
+    in_memory::user_repository::InMemoryUserRepository,
+    misc::{
+        password_provider_prod::PasswordProviderProd, user_id_provider_prod::UserIdProviderProd,
+    },
+};
 use axum::{
     routing::{get, post},
     Router,
@@ -16,7 +21,11 @@ async fn main() {
     tracing_subscriber::registry()
         .with(
             tracing_subscriber::EnvFilter::try_from_default_env().unwrap_or_else(|_| {
-                format!("{}=debug,tower_http=debug,snk_core=debug", env!("CARGO_CRATE_NAME")).into()
+                format!(
+                    "{}=debug,tower_http=debug,snk_core=debug",
+                    env!("CARGO_CRATE_NAME")
+                )
+                .into()
             }),
         )
         .with(tracing_subscriber::fmt::layer())
@@ -26,7 +35,6 @@ async fn main() {
     let user_repository = InMemoryUserRepository::default();
     let user_id_provider = UserIdProviderProd::default();
     let password_provider = PasswordProviderProd::default();
-  
 
     // TODO API routes
 
@@ -48,10 +56,7 @@ async fn main() {
     // - DELETE /providers/{providerType}/playlist/{playlistId}/tracks : Delete tracks from playlist
 
     let auth_routes = Router::new()
-        .route(
-            "/signup",
-            post(signup::handler::<_, _ , _>),
-        )
+        .route("/signup", post(signup::handler::<_, _, _>))
         .route("/login", post(login::handler::<_, _, _>));
 
     let app = Router::new()

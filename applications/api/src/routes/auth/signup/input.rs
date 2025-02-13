@@ -17,22 +17,17 @@ impl TryFrom<CredentialsSignupBody> for CredentialsSignupRequest {
     type Error = String;
 
     fn try_from(body: CredentialsSignupBody) -> Result<Self, Self::Error> {
-        let email = Email::new(body.email)
-            .map_err(|err| {
-                tracing::error!({ %err }, "Error while parsing email");
-                // Field name as error
-                "email".to_string()
-            })?;
-        let password = UserPassword::new(body.password)
-            .map_err(|err| {
-                tracing::error!({ %err }, "Error while parsing password");
-                // Field name as error
-                "password".to_string()
-            })?;
+        let email = Email::new(body.email).map_err(|err| {
+            tracing::error!({ %err }, "Error while parsing email");
+            // Field name as error
+            "email".to_string()
+        })?;
+        let password = UserPassword::new(body.password).map_err(|err| {
+            tracing::error!({ %err }, "Error while parsing password");
+            // Field name as error
+            "password".to_string()
+        })?;
 
-        Ok(Self {
-            email,
-            password
-        })
+        Ok(Self { email, password })
     }
 }
