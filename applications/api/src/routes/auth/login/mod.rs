@@ -1,4 +1,5 @@
 mod input;
+pub mod oauth2;
 mod output;
 
 use axum::{extract::State, http::StatusCode};
@@ -12,26 +13,27 @@ use snk_core::{
         },
         repositories::user_repository::UserRepository,
     },
-    queries::credentials_login_user::{
-        CredentialsLoginUserQuery, CredentialsLoginUserQueryError, CredentialsLoginUserQueryOutput,
+    queries::credentials_authorize_user::{
+        CredentialsAuthorizeUserQuery, CredentialsAuthorizeUserQueryError,
+        CredentialsAuthorizeUserQueryOutput,
     },
 };
 
 use crate::{state::AppState, utils::extractors::body::AppJsonBody};
 
-impl From<CredentialsLoginUserQueryError> for LoginError {
-    fn from(error: CredentialsLoginUserQueryError) -> Self {
+impl From<CredentialsAuthorizeUserQueryError> for LoginError {
+    fn from(error: CredentialsAuthorizeUserQueryError) -> Self {
         tracing::error!({ %error }, "Error while executing query");
         match error {
-            CredentialsLoginUserQueryError::BadCredentials => Self {
+            CredentialsAuthorizeUserQueryError::BadCredentials => Self {
                 status: StatusCode::BAD_REQUEST.as_u16(),
                 message: error.to_string(),
             },
-            CredentialsLoginUserQueryError::EmailNotVerified => Self {
+            CredentialsAuthorizeUserQueryError::EmailNotVerified => Self {
                 status: StatusCode::BAD_REQUEST.as_u16(),
                 message: error.to_string(),
             },
-            CredentialsLoginUserQueryError::InternalError(_) => Self {
+            CredentialsAuthorizeUserQueryError::InternalError(_) => Self {
                 status: StatusCode::INTERNAL_SERVER_ERROR.as_u16(),
                 message: "Internal error server".to_string(),
             },
@@ -39,8 +41,8 @@ impl From<CredentialsLoginUserQueryError> for LoginError {
     }
 }
 
-impl From<CredentialsLoginUserQueryOutput> for LoginResponse {
-    fn from(output: CredentialsLoginUserQueryOutput) -> Self {
+impl From<CredentialsAuthorizeUserQueryOutput> for LoginResponse {
+    fn from(output: CredentialsAuthorizeUserQueryOutput) -> Self {
         Self {
             access_token: output.access_token,
             refresh_token: output.refresh_token,
@@ -63,7 +65,7 @@ where
     AccessTokenProv: TokenProvider,
     RefreshTokenProv: TokenProvider,
 {
-    let output = CredentialsLoginUserQuery::new(payload.email, payload.password)
+    let output = CredentialsAuthorizeUserQuery::new(payload.email, payload.password)
         .execute(
             &state.user_repo,
             &state.password_provider,

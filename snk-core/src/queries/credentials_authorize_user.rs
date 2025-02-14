@@ -12,13 +12,13 @@ use crate::{
     value_objects::{auth::auth_token_claims::AuthTokenClaims, misc::email::Email, user::user_password::UserPassword},
 };
 
-pub struct CredentialsLoginUserQuery {
+pub struct CredentialsAuthorizeUserQuery {
     email: Email,
     password: UserPassword,
 }
 
 #[derive(Debug, Error)]
-pub enum CredentialsLoginUserQueryError {
+pub enum CredentialsAuthorizeUserQueryError {
     #[error("Email or password incorrect")]
     BadCredentials,
     #[error("Email not verified")]
@@ -27,31 +27,31 @@ pub enum CredentialsLoginUserQueryError {
     InternalError(String),
 }
 
-impl From<PasswordProviderError> for CredentialsLoginUserQueryError {
+impl From<PasswordProviderError> for CredentialsAuthorizeUserQueryError {
     fn from(error: PasswordProviderError) -> Self {
         Self::InternalError(error.to_string())
     }
 }
 
-impl From<TokenProviderError> for CredentialsLoginUserQueryError {
+impl From<TokenProviderError> for CredentialsAuthorizeUserQueryError {
     fn from(error: TokenProviderError) -> Self {
         Self::InternalError(error.to_string())
     }
 }
 
-impl From<UserRepositoryError> for CredentialsLoginUserQueryError {
+impl From<UserRepositoryError> for CredentialsAuthorizeUserQueryError {
     fn from(error: UserRepositoryError) -> Self {
         Self::InternalError(error.to_string())
     }
 }
 
-pub struct CredentialsLoginUserQueryOutput {
+pub struct CredentialsAuthorizeUserQueryOutput {
     pub access_token: String,
     pub refresh_token: String,
     pub expires_in: Duration,
 }
 
-impl CredentialsLoginUserQuery {
+impl CredentialsAuthorizeUserQuery {
     pub fn new(email: Email, password: UserPassword) -> Self {
         Self { email, password }
     }
@@ -62,23 +62,23 @@ impl CredentialsLoginUserQuery {
         password_provider: &impl PasswordProvider,
         access_token_provider: &impl TokenProvider,
         refresh_token_provider: &impl TokenProvider,
-    ) -> Result<CredentialsLoginUserQueryOutput, CredentialsLoginUserQueryError> {
+    ) -> Result<CredentialsAuthorizeUserQueryOutput, CredentialsAuthorizeUserQueryError> {
         // Verify if user exists
         let maybe_user = user_repo.get_from_email(&self.email).await?;
         let Some(user) = maybe_user else {
-          return Err(CredentialsLoginUserQueryError::BadCredentials);
+          return Err(CredentialsAuthorizeUserQueryError::BadCredentials);
         };
 
         // Check password
         if !password_provider.verify_password(self.password.as_ref(), user.password.as_ref()).await? { 
-          return Err(CredentialsLoginUserQueryError::BadCredentials);
+          return Err(CredentialsAuthorizeUserQueryError::BadCredentials);
         }
 
         // Check email verified
-        // if !user.email_verified {
-        //     // TODO trigger sending verification email via event bus
-        //     return Err(CredentialsLoginUserQueryError::EmailNotVerified);
-        // }
+        if !user.email_verified {
+            // TODO trigger sending verification email via event bus
+            return Err(CredentialsAuthorizeUserQueryError::EmailNotVerified);
+        }
 
         // Grant access & refresh token
         let access_token_exp = Utc::now() + ACCESS_TOKEN_EXP_TIME;
@@ -99,7 +99,7 @@ impl CredentialsLoginUserQuery {
         let access_token = access_token_provider.generate_token(access_token_claims).await?;
         let refresh_token = refresh_token_provider.generate_token(refresh_token_claims).await?;
 
-        Ok(CredentialsLoginUserQueryOutput {
+        Ok(CredentialsAuthorizeUserQueryOutput {
             access_token,
             refresh_token,
             expires_in: ACCESS_TOKEN_EXP_TIME,

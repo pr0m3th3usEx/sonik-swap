@@ -1,1 +1,1 @@
-pub mod credentials_login_user;
+pub mod credentials_authorize_user;

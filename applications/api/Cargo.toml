@@ -22,3 +22,4 @@ snk-core.workspace = true
 
 # Adapters
 adapters.workspace = true
+oauth2 = "5.0.0"

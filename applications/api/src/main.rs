@@ -32,6 +32,13 @@ async fn main() {
         .with(tracing_subscriber::fmt::layer())
         .init();
 
+    // Check env vars
+    let _ = std::env::var("SPOTIFY_OAUTH2_CLIENT_ID").expect("SPOTIFY_OAUTH2_CLIENT_ID set");
+    let _ =
+        std::env::var("SPOTIFY_OAUTH2_CLIENT_SECRET").expect("SPOTIFY_OAUTH2_CLIENT_SECRET set");
+    let _ = std::env::var("APP_DASHBOARD_URL").expect("APP_DASHBOARD_URL set");
+    let _ = std::env::var("SPOTIFY_OAUTH2_BASE_URL").expect("SPOTIFY_OAUTH2_BASE_URL set");
+
     // Initialize repositories & providers
     let user_repository = InMemoryUserRepository::default();
     let user_id_provider = UserIdProviderProd::default();
@@ -68,7 +75,11 @@ async fn main() {
 
     let auth_routes = Router::new()
         .route("/signup", post(signup::handler::<_, _, _, _, _>))
-        .route("/login", post(login::handler::<_, _, _, _, _>));
+        // .route("/signup/oauth2/{provider_id}", get(signup::oauth2::handler::<_, _, _, _, _,>))
+        // .route("/signup/oauth2/{provider_id}/callback", post(signup::oauth2::handler::<_, _, _, _, _,>))
+        .route("/login", post(login::handler::<_, _, _, _, _>))
+        .route("/login/oauth2/:provider_id", get(login::oauth2::handler));
+    // .route("/login/oauth2/{provider_id}/callback", post(login::oauth2::handler::<_, _, _, _, _,>))
 
     let app = Router::new()
         .route("/api", get(health))
