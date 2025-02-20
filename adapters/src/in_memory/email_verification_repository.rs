@@ -4,7 +4,7 @@ use snk_core::{
     contracts::repositories::email_verification_repository::{
         EmailVerificationRepository, EmailVerificationRepositoryError, EmailVerificationRepositoryResult
     },
-    entities::email_verification::EmailVerificationToken,
+    entities::auth::email_verification::EmailVerificationToken,
 };
 #[derive(Clone)]
 pub struct InMemoryEmailVerificationRepository {
@@ -64,7 +64,7 @@ impl EmailVerificationRepository for InMemoryEmailVerificationRepository {
 mod tests {
     use super::*;
     use chrono::Utc;
-    use snk_core::entities::email_verification::EmailVerificationToken;
+    use snk_core::entities::auth::email_verification::EmailVerificationToken;
 
     #[tokio::test]
     async fn test_add() {

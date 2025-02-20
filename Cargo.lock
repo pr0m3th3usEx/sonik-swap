@@ -9,6 +9,7 @@ dependencies = [
  "argon2",
  "chrono",
  "jsonwebtoken",
+ "oauth2",
  "rand_core",
  "serde",
  "snk-core",
@@ -875,6 +876,7 @@ name = "integrations"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "oauth2",
  "partially",
  "reqwest",
  "serde",
@@ -1775,6 +1777,7 @@ version = "0.1.0"
 dependencies = [
  "base64",
  "chrono",
+ "oauth2",
  "regex",
  "rstest",
  "serde",

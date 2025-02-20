@@ -1,6 +1,6 @@
 use thiserror::Error;
 
-use crate::entities::email_verification::EmailVerificationToken;
+use crate::entities::auth::email_verification::EmailVerificationToken;
 
 #[derive(Debug, Error)]
 pub enum EmailVerificationRepositoryError {

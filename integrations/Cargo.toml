@@ -11,4 +11,5 @@ snk-core.workspace = true
 tokio.workspace = true
 url.workspace = true
 chrono.workspace = true
+oauth2.workspace = true
 partially = { version = "0.2.1", features = ["derive"] }

@@ -15,6 +15,8 @@ uuid = { version = "1.11.0", features = ["std", "v4", "serde"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0.133"
 
+oauth2 = "5.0.0"
+
 # Business core
 snk-core = { path = "./snk-core" }
 adapters = { path = "./adapters" }

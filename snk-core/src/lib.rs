@@ -5,3 +5,4 @@ pub mod entities;
 pub mod value_objects;
 pub mod commands;
 pub mod queries;
+pub mod utils;

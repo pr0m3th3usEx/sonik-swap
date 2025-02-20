@@ -1,7 +1,6 @@
 use thiserror::Error;
-use uuid::Uuid;
 
-use crate::entities::music_account_provider::MusicAccountProvider;
+use crate::{entities::music_account_provider::MusicAccountProvider, value_objects::provider::provider_id::ProviderId};
 
 #[derive(Debug, Error)]
 pub enum MusicAccountProviderRepositoryError {
@@ -17,13 +16,13 @@ pub trait MusicAccountProviderRepository {
     /// Get provider information
     ///
     /// Arguments:
-    /// - id: [`Uuid`]
+    /// - id: [`&ProviderId`]
     ///
     /// Returns:
     /// - [`Option<MusicAccountProvider>`] or [`MusicAccountProviderRepositoryError`]
     async fn get(
         &self,
-        id: Uuid,
+        id: &ProviderId,
     ) -> MusicAccountProviderRepositoryResult<Option<MusicAccountProvider>>;
 
     /// Get list of all providers
@@ -55,4 +54,12 @@ pub trait MusicAccountProviderRepository {
         &self,
         new: MusicAccountProvider,
     ) -> MusicAccountProviderRepositoryResult<MusicAccountProvider>;
+
+    /// Get Providers used for authentication
+    ///
+    /// Arguments: None
+    /// 
+    /// Returns:
+    /// if successful [`Vec<MusicAccountProvider>`] otherwise [`MusicAccountProviderRepositoryError`]
+    async fn get_auth_providers(&self) -> MusicAccountProviderRepositoryResult<Vec<MusicAccountProvider>>;
 }

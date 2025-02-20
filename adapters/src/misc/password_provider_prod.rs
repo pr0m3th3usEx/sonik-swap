@@ -83,7 +83,7 @@ mod tests {
     async fn test_verify_password() {
         let pwd_provider = PasswordProviderProd::new(None);
 
-        let password = "passwor";
+        let password = "password";
         let hash = "$argon2id$v=19$m=19456,t=2,p=1$YmFkIHNhbHQh$DqHGwv6NQV0VcaJi7jeF1E8IpfMXmXcpq4r2kKyqpXk";
 
         let is_valid = pwd_provider
