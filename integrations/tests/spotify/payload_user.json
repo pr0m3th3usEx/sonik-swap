@@ -1,0 +1,33 @@
+{
+  "country": "FR",
+  "display_name": "darklight956",
+  "email": "test@gmail.com",
+  "explicit_content": {
+    "filter_enabled": false,
+    "filter_locked": false
+  },
+  "external_urls": {
+    "spotify": "https://open.spotify.com/user/darklight956"
+  },
+  "followers": {
+    "href": null,
+    "total": 1
+  },
+  "href": "https://api.spotify.com/v1/users/darklight956",
+  "id": "darklight956",
+  "images": [
+    {
+      "height": 300,
+      "url": "https://i.scdn.co/image/ab6775700000ee853fb7808bb8a0ce4b81f27856",
+      "width": 300
+    },
+    {
+      "height": 64,
+      "url": "https://i.scdn.co/image/ab67757000003b823fb7808bb8a0ce4b81f27856",
+      "width": 64
+    }
+  ],
+  "product": "premium",
+  "type": "user",
+  "uri": "spotify:user:darklight956"
+}

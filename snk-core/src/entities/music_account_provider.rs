@@ -5,11 +5,11 @@ use crate::value_objects::provider::{provider_id::ProviderId, provider_name::Pro
 #[derive(Clone, Hash)]
 pub struct MusicAccountProvider {
     /// Sonik Swap Provider ID
-    pub id: ProviderId,                    
+    pub id: ProviderId,
     /// Name of the platform
-    pub name: ProviderName,  
+    pub name: ProviderName,
     /// Hex decimal color              
-    pub color: u32,             
+    pub color: u32,
     /// OAuth2 Authorization URL          
     pub auth_url: AuthUrl,
     /// OAuth2 Token URL                 

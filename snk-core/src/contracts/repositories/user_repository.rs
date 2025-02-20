@@ -1,6 +1,9 @@
 use thiserror::Error;
 
-use crate::{entities::user::User, value_objects::{misc::email::Email, user::user_id::UserId}};
+use crate::{
+    entities::user::User,
+    value_objects::{misc::email::Email, user::user_id::UserId},
+};
 
 #[derive(Debug, Error)]
 pub enum UserRepositoryError {

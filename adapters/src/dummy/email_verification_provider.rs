@@ -2,7 +2,8 @@ use chrono::DateTime;
 use snk_core::{
     contracts::repositories::email_verification_repository::{
         EmailVerificationRepository, EmailVerificationRepositoryResult,
-    }, entities::auth::email_verification::EmailVerificationToken,
+    },
+    entities::auth::email_verification::EmailVerificationToken,
 };
 
 #[derive(Default)]

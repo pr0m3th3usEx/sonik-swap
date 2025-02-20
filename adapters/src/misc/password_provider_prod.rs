@@ -44,12 +44,14 @@ impl PasswordProvider for PasswordProviderProd<'_> {
         let passowrd_hash = PasswordHash::new(hash)
             .map_err(|e| PasswordProviderError::VerifyError(e.to_string()))?;
 
-        if let Err(e) = self.engine
-            .verify_password(password.as_bytes(), &passowrd_hash) {
-              return match e {
+        if let Err(e) = self
+            .engine
+            .verify_password(password.as_bytes(), &passowrd_hash)
+        {
+            return match e {
                 password_hash::Error::Password => Ok(false),
-                other => Err(PasswordProviderError::VerifyError(other.to_string()))
-              };
+                other => Err(PasswordProviderError::VerifyError(other.to_string())),
+            };
         }
 
         Ok(true)

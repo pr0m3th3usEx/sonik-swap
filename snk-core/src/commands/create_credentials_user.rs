@@ -70,18 +70,13 @@ impl CreateCredentialsUserCommand {
 
         let user_id = id_provider.generate();
         let hashed_password = UserPassword::from_hash(
-            password_provider.hash_password(self.password.as_ref()).await?
+            password_provider
+                .hash_password(self.password.as_ref())
+                .await?,
         );
 
         // Add user to database
-        let user_to_create = User::new(
-            user_id,
-            self.email,
-            false,
-            hashed_password,
-            None,
-            None,
-        );
+        let user_to_create = User::new(user_id, self.email, false, hashed_password, None, None);
 
         let new_user = user_repo.add(user_to_create).await?;
 

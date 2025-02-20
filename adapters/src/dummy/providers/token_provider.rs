@@ -3,10 +3,7 @@ use snk_core::contracts::providers::token_provider::{TokenProvider, TokenProvide
 pub struct DummyTokenProvider {}
 
 impl TokenProvider for DummyTokenProvider {
-    async fn generate_token<T>(
-        &self,
-        _claims: T,
-    ) -> TokenProviderResult<String>
+    async fn generate_token<T>(&self, _claims: T) -> TokenProviderResult<String>
     where
         T: serde::Serialize,
     {

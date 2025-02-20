@@ -13,10 +13,7 @@ pub enum TokenProviderError {
 pub type TokenProviderResult<T> = Result<T, TokenProviderError>;
 
 pub trait TokenProvider {
-    async fn generate_token<T>(
-        &self,
-        claims: T,
-    ) -> TokenProviderResult<String>
+    async fn generate_token<T>(&self, claims: T) -> TokenProviderResult<String>
     where
         T: serde::Serialize;
 

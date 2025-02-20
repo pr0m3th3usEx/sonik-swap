@@ -143,3 +143,14 @@ pub struct SpotifyFollowers {
 pub struct SpotifyUri {
     pub uri: String,
 }
+
+#[derive(Debug, Deserialize)]
+#[serde(rename = "camel_case")]
+pub enum SpotifyProduct {
+    #[serde(alias = "premium")]
+    Premium,
+    #[serde(alias = "free")]
+    Free,
+    #[serde(alias = "open")]
+    Open,
+}

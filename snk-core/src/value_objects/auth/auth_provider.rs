@@ -12,7 +12,7 @@ impl FromStr for AuthProvider {
         match s.to_lowercase().trim() {
             "spotify" => Ok(AuthProvider::Spotify),
             "deezer" => Ok(AuthProvider::Deezer),
-            _ => Err("unknown provider")
+            _ => Err("unknown provider"),
         }
     }
 }

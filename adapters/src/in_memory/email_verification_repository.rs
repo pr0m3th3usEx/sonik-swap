@@ -2,7 +2,8 @@ use std::sync::{Arc, RwLock};
 
 use snk_core::{
     contracts::repositories::email_verification_repository::{
-        EmailVerificationRepository, EmailVerificationRepositoryError, EmailVerificationRepositoryResult
+        EmailVerificationRepository, EmailVerificationRepositoryError,
+        EmailVerificationRepositoryResult,
     },
     entities::auth::email_verification::EmailVerificationToken,
 };
@@ -21,7 +22,8 @@ impl Default for InMemoryEmailVerificationRepository {
 
 impl EmailVerificationRepository for InMemoryEmailVerificationRepository {
     async fn add(
-        &self, ev_token: EmailVerificationToken
+        &self,
+        ev_token: EmailVerificationToken,
     ) -> EmailVerificationRepositoryResult<EmailVerificationToken> {
         let mut store = self.email_tokens.write().expect("lock poisoned");
 
@@ -37,25 +39,31 @@ impl EmailVerificationRepository for InMemoryEmailVerificationRepository {
     ) -> EmailVerificationRepositoryResult<Option<EmailVerificationToken>> {
         let store = self.email_tokens.read().expect("lock poisoned");
 
-        let result = store.iter().find(|ev_token| {
-            ev_token.user_id == user_id && ev_token.token == token
-        });
+        let result = store
+            .iter()
+            .find(|ev_token| ev_token.user_id == user_id && ev_token.token == token);
 
         Ok(result.cloned())
     }
-    
-    async fn update(&self, old: EmailVerificationToken, new: EmailVerificationToken) -> EmailVerificationRepositoryResult<EmailVerificationToken> {
+
+    async fn update(
+        &self,
+        old: EmailVerificationToken,
+        new: EmailVerificationToken,
+    ) -> EmailVerificationRepositoryResult<EmailVerificationToken> {
         let mut store = self.email_tokens.write().expect("lock poisoned");
 
-        let result = store.iter_mut().find(|ev_token| {
-            ev_token.user_id == old.user_id && ev_token.token == old.token
-        });
+        let result = store
+            .iter_mut()
+            .find(|ev_token| ev_token.user_id == old.user_id && ev_token.token == old.token);
 
         if let Some(ev_token) = result {
             *ev_token = new;
             Ok(ev_token.clone())
         } else {
-            Err(EmailVerificationRepositoryError::ServiceError("Token not found".to_string()))
+            Err(EmailVerificationRepositoryError::ServiceError(
+                "Token not found".to_string(),
+            ))
         }
     }
 }
@@ -75,13 +83,7 @@ mod tests {
         let expires_at = Utc::now();
         let created_at = Utc::now();
 
-        let ev_token = EmailVerificationToken::new(
-            user_id,
-            token,
-            false,
-            expires_at,
-            created_at
-        );
+        let ev_token = EmailVerificationToken::new(user_id, token, false, expires_at, created_at);
 
         let result = repo.add(ev_token.clone()).await.unwrap();
 
@@ -97,14 +99,7 @@ mod tests {
         let expires_at = Utc::now();
         let created_at = Utc::now();
 
-        let ev_token = EmailVerificationToken::new(
-            user_id,
-            token,
-            false,
-            expires_at,
-            created_at
-        );
-
+        let ev_token = EmailVerificationToken::new(user_id, token, false, expires_at, created_at);
 
         repo.add(ev_token.clone()).await.unwrap();
 
@@ -132,15 +127,13 @@ mod tests {
 
         repo.add(ev_token.clone()).await.unwrap();
 
-        let new_ev_token = EmailVerificationToken::new(
-            user_id,
-            token,
-            true,
-            Utc::now(),
-            created_at
-        );
+        let new_ev_token =
+            EmailVerificationToken::new(user_id, token, true, Utc::now(), created_at);
 
-        let result = repo.update(ev_token.clone(), new_ev_token.clone()).await.unwrap();
+        let result = repo
+            .update(ev_token.clone(), new_ev_token.clone())
+            .await
+            .unwrap();
 
         assert_eq!(new_ev_token, result);
     }
