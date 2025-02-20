@@ -83,8 +83,11 @@ async fn main() {
         // .route("/signup/oauth2/{provider_id}", get(signup::oauth2::handler::<_, _, _, _, _,>))
         // .route("/signup/oauth2/{provider_id}/callback", post(signup::oauth2::handler::<_, _, _, _, _,>))
         .route("/login", post(login::handler::<_, _, _, _, _, _>))
+        .route(
+            "/login/oauth2/:provider_id/callback",
+            get(login::oauth2::callback::handler),
+        )
         .route("/login/oauth2/:provider_id", get(login::oauth2::handler));
-    // .route("/login/oauth2/{provider_id}/callback", post(login::oauth2::handler::<_, _, _, _, _,>))
 
     let app = Router::new()
         .route("/api", get(health))

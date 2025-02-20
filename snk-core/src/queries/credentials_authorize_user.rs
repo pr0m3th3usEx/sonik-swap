@@ -81,10 +81,11 @@ impl CredentialsAuthorizeUserQuery {
         }
 
         // Grant access & refresh token
+        // TODO Put in a utils function
         let access_token_exp = Utc::now() + ACCESS_TOKEN_EXP_TIME;
         let refresh_token_exp = Utc::now() + REFRESH_TOKEN_EXP_TIME;
 
-        let access_token_claims = AuthTokenClaims::new(
+        let access_token_claims: AuthTokenClaims = AuthTokenClaims::new(
             user.id.value().to_string(),
             access_token_exp.timestamp(),
             0, // TODO once integration

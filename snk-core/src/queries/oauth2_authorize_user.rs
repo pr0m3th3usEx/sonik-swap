@@ -61,10 +61,6 @@ impl OAuth2AuthorizeUserQuery {
             return Err(OAuth2AuthorizeUserQueryError::ProviderNotFound);
         };
 
-        if !auth_provider.authentication_allowed {
-            return Err(OAuth2AuthorizeUserQueryError::ProviderNotFound);
-        }
-
         // Create oauth2 client
         let client = BasicClient::new(client_id)
             .set_client_secret(client_secret)
