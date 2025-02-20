@@ -1,10 +1,34 @@
+pub mod callback;
+mod input;
+
 use axum::{
     body::Body,
-    extract::Path,
+    extract::State,
     http::StatusCode,
     response::{IntoResponse, Redirect},
 };
-use oauth2::{basic::BasicClient, AuthUrl, ClientId, ClientSecret, CsrfToken, RedirectUrl, Scope};
+use input::{
+    OAuth2AuthorizeRequestParams, OAuth2AuthorizeRequestParamsParsed, OAuth2AuthorizeRequestQuery,
+    OAuth2AuthorizeRequestQueryParsed,
+};
+use snk_core::{
+    contracts::{
+        providers::{
+            password_provider::PasswordProvider, token_provider::TokenProvider,
+            user_id_provider::UserIdProvider,
+        },
+        repositories::{
+            music_account_provider_repository::MusicAccountProviderRepository,
+            user_repository::UserRepository,
+        },
+    },
+    queries::oauth2_authorize_user::{OAuth2AuthorizeUserQuery, OAuth2AuthorizeUserQueryError},
+};
+
+use crate::{
+    state::AppState,
+    utils::extractors::{params::AppPathParams, query::AppQueryParams},
+};
 
 pub enum OAuth2Error {
     NotFound,
@@ -24,58 +48,57 @@ impl IntoResponse for OAuth2Error {
     }
 }
 
-// Csrf token custom function enabling get information about-provider
-fn custom_csrf_token(provider_id: String) -> impl FnOnce() -> CsrfToken {
-    move || {
-        CsrfToken::new(format!(
-            "{}-{}",
-            provider_id,
-            CsrfToken::new_random().secret()
-        ))
+impl From<OAuth2AuthorizeUserQueryError> for OAuth2Error {
+    fn from(error: OAuth2AuthorizeUserQueryError) -> Self {
+        match error {
+            // TODO Improve error response
+            OAuth2AuthorizeUserQueryError::ProviderNotFound => OAuth2Error::NotFound,
+            OAuth2AuthorizeUserQueryError::InternalError(err) => {
+                tracing::error!({ %err }, "Internal error");
+                OAuth2Error::InternalError
+            }
+        }
     }
 }
 
-pub async fn handler(Path(provider_id): Path<String>) -> Result<Redirect, OAuth2Error> {
-    let app_dashboard_url = std::env::var("APP_DASHBOARD_URL").unwrap();
+pub async fn handler<
+    UserRepo,
+    MusicAccountProvRepo,
+    UserIdProv,
+    PassswordProv,
+    AccessTokenProv,
+    RefreshTokenProv,
+>(
+    State(state): State<
+        AppState<
+            UserRepo,
+            MusicAccountProvRepo,
+            UserIdProv,
+            PassswordProv,
+            AccessTokenProv,
+            RefreshTokenProv,
+        >,
+    >,
+    AppPathParams(params, _): AppPathParams<
+        OAuth2AuthorizeRequestParams,
+        OAuth2AuthorizeRequestParamsParsed,
+    >,
+    AppQueryParams(query, _): AppQueryParams<
+        OAuth2AuthorizeRequestQuery,
+        OAuth2AuthorizeRequestQueryParsed,
+    >,
+) -> Result<Redirect, OAuth2Error>
+where
+    UserRepo: UserRepository,
+    MusicAccountProvRepo: MusicAccountProviderRepository,
+    UserIdProv: UserIdProvider,
+    PassswordProv: PasswordProvider,
+    AccessTokenProv: TokenProvider,
+    RefreshTokenProv: TokenProvider,
+{
+    let response = OAuth2AuthorizeUserQuery::new(params.provider_id, query.redirect_url)
+        .execute(&state.music_account_provider_repo)
+        .await?;
 
-    let client;
-    let client_id: String;
-    let client_secret: String;
-    let auth_url: String;
-    let redirect_url: String;
-
-    // Hard coded allowed provider (spotify / deezer)
-    // TODO Change later (not urgent)
-    match provider_id.to_lowercase().as_str() {
-        "spotify" => {
-            // Check present of variables (verified at start up)
-            let client_base_url = std::env::var("SPOTIFY_OAUTH2_BASE_URL").unwrap();
-
-            client_id = std::env::var("SPOTIFY_OAUTH2_CLIENT_ID").unwrap();
-            client_secret = std::env::var("SPOTIFY_OAUTH2_CLIENT_SECRET").unwrap();
-            auth_url = format!("{}/authorize", client_base_url);
-            redirect_url = format!("{}/auth/oauth2/callback", app_dashboard_url);
-
-            client = BasicClient::new(ClientId::new(client_id))
-                .set_client_secret(ClientSecret::new(client_secret))
-                .set_auth_uri(AuthUrl::new(auth_url).map_err(|_| OAuth2Error::InternalError)?)
-                .set_redirect_uri(
-                    RedirectUrl::new(redirect_url).map_err(|_| OAuth2Error::InternalError)?,
-                );
-
-            let (auth_url, _) = client
-                .authorize_url(custom_csrf_token(provider_id))
-                .add_scope(Scope::new("user-library-read".to_string()))
-                .add_scope(Scope::new("user-library-modify".to_string()))
-                .add_scope(Scope::new("playlist-modify-private".to_string()))
-                .add_scope(Scope::new("playlist-read-private".to_string()))
-                .add_scope(Scope::new("user-read-private".to_string()))
-                .add_scope(Scope::new("user-read-email".to_string()))
-                .url();
-
-            Ok(Redirect::temporary(auth_url.as_str()))
-        }
-        "deezer" => todo!(),
-        _ => Err(OAuth2Error::NotFound),
-    }
+    Ok(Redirect::temporary(response.auth_url.as_str()))
 }

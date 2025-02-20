@@ -3,7 +3,10 @@ mod state;
 pub mod utils;
 
 use adapters::{
-    in_memory::user_repository::InMemoryUserRepository,
+    in_memory::{
+        music_account_provider_repository::InMemoryMusicAccountProviderRepository,
+        user_repository::InMemoryUserRepository,
+    },
     misc::{
         jwt_provider::JwtProvider, password_provider_prod::PasswordProviderProd,
         user_id_provider_prod::UserIdProviderProd,
@@ -54,6 +57,8 @@ async fn main() {
             .to_string(),
     );
 
+    let music_account_provider_repo = InMemoryMusicAccountProviderRepository::seed();
+
     // TODO API routes
 
     // - GET  /user/me: Current logged in user information
@@ -74,10 +79,10 @@ async fn main() {
     // - DELETE /providers/{providerType}/playlist/{playlistId}/tracks : Delete tracks from playlist
 
     let auth_routes = Router::new()
-        .route("/signup", post(signup::handler::<_, _, _, _, _>))
+        .route("/signup", post(signup::handler::<_, _, _, _, _, _>))
         // .route("/signup/oauth2/{provider_id}", get(signup::oauth2::handler::<_, _, _, _, _,>))
         // .route("/signup/oauth2/{provider_id}/callback", post(signup::oauth2::handler::<_, _, _, _, _,>))
-        .route("/login", post(login::handler::<_, _, _, _, _>))
+        .route("/login", post(login::handler::<_, _, _, _, _, _>))
         .route("/login/oauth2/:provider_id", get(login::oauth2::handler));
     // .route("/login/oauth2/{provider_id}/callback", post(login::oauth2::handler::<_, _, _, _, _,>))
 
@@ -91,6 +96,7 @@ async fn main() {
             password_provider,
             access_token_provider,
             refresh_token_provider,
+            music_account_provider_repo,
         });
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000")

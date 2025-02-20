@@ -8,6 +8,7 @@ tokio.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 uuid.workspace = true
+oauth2.workspace = true
 
 axum = { version =  "0.7.9", features = ["macros"] }
 
@@ -22,4 +23,3 @@ snk-core.workspace = true
 
 # Adapters
 adapters.workspace = true
-oauth2 = "5.0.0"

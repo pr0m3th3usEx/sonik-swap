@@ -11,7 +11,10 @@ use snk_core::{
             password_provider::PasswordProvider, token_provider::TokenProvider,
             user_id_provider::UserIdProvider,
         },
-        repositories::user_repository::UserRepository,
+        repositories::{
+            music_account_provider_repository::MusicAccountProviderRepository,
+            user_repository::UserRepository,
+        },
     },
     queries::credentials_authorize_user::{
         CredentialsAuthorizeUserQuery, CredentialsAuthorizeUserQueryError,
@@ -52,14 +55,29 @@ impl From<CredentialsAuthorizeUserQueryOutput> for LoginResponse {
 }
 
 /// - POST /auth/login: Login user
-pub async fn handler<UserRepo, UserIdProv, PassswordProv, AccessTokenProv, RefreshTokenProv>(
+pub async fn handler<
+    UserRepo,
+    MusicAccountProvRepo,
+    UserIdProv,
+    PassswordProv,
+    AccessTokenProv,
+    RefreshTokenProv,
+>(
     State(state): State<
-        AppState<UserRepo, UserIdProv, PassswordProv, AccessTokenProv, RefreshTokenProv>,
+        AppState<
+            UserRepo,
+            MusicAccountProvRepo,
+            UserIdProv,
+            PassswordProv,
+            AccessTokenProv,
+            RefreshTokenProv,
+        >,
     >,
     AppJsonBody(payload, _): AppJsonBody<CredentialsLoginBody, CredentialsLoginRequest>,
 ) -> Result<LoginResponse, LoginError>
 where
     UserRepo: UserRepository,
+    MusicAccountProvRepo: MusicAccountProviderRepository,
     UserIdProv: UserIdProvider,
     PassswordProv: PasswordProvider,
     AccessTokenProv: TokenProvider,

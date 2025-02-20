@@ -13,7 +13,10 @@ use snk_core::{
             password_provider::PasswordProvider, token_provider::TokenProvider,
             user_id_provider::UserIdProvider,
         },
-        repositories::user_repository::UserRepository,
+        repositories::{
+            music_account_provider_repository::MusicAccountProviderRepository,
+            user_repository::UserRepository,
+        },
     },
 };
 
@@ -36,14 +39,29 @@ impl From<CreateCredentialsUserCommandError> for SignupError {
 }
 
 /// - POST /auth/signup: Create a new user account
-pub async fn handler<UserRepo, UserIdProv, PassswordProv, AccessTokenProv, RefreshTokenProv>(
+pub async fn handler<
+    UserRepo,
+    MusicAccountProvRepo,
+    UserIdProv,
+    PassswordProv,
+    AccessTokenProv,
+    RefreshTokenProv,
+>(
     State(state): State<
-        AppState<UserRepo, UserIdProv, PassswordProv, AccessTokenProv, RefreshTokenProv>,
+        AppState<
+            UserRepo,
+            MusicAccountProvRepo,
+            UserIdProv,
+            PassswordProv,
+            AccessTokenProv,
+            RefreshTokenProv,
+        >,
     >,
     AppJsonBody(payload, _): AppJsonBody<CredentialsSignupBody, CredentialsSignupRequest>,
 ) -> Result<SignupResponse, SignupError>
 where
     UserRepo: UserRepository,
+    MusicAccountProvRepo: MusicAccountProviderRepository,
     UserIdProv: UserIdProvider,
     PassswordProv: PasswordProvider,
     AccessTokenProv: TokenProvider,
