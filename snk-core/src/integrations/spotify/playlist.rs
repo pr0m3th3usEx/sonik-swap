@@ -1,10 +1,10 @@
 use std::collections::HashSet;
 
-use serde::Deserialize;
-use snk_core::{
+use crate::{
     entities::playlist::Playlist,
     value_objects::{image_cover::ImageCover, playlist_id::PlaylistId},
 };
+use serde::Deserialize;
 use url::Url;
 
 use super::{
@@ -183,7 +183,7 @@ mod tests {
 
     #[test]
     fn test_deserialize_playlist() {
-        let payload = include_str!("../../tests/spotify/payload_playlist.json");
+        let payload = include_str!("../../../tests/spotify/payload_playlist.json");
         let json = serde_json::from_str::<SpotifyPlaylist>(&payload).expect("valid json");
 
         assert_eq!(json.name, "My Dearest OST");

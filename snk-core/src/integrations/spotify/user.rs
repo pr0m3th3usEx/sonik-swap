@@ -1,10 +1,10 @@
-use serde::Deserialize;
-use snk_core::{
+use crate::{
     entities::provider_account::ProviderAccount,
     value_objects::provider_account::{
         provider_account_id::ProviderAccountId, provider_account_username::ProviderAccountUsername,
     },
 };
+use serde::Deserialize;
 use url::Url;
 
 use super::common::{SpotifyExternalUrls, SpotifyFollowers, SpotifyImage, SpotifyProduct};
@@ -39,12 +39,12 @@ pub struct SpotifyUserExplicitContent {
     _filter_locked: bool,
 }
 
-impl Into<ProviderAccount> for SpotifyUser {
-    fn into(self) -> ProviderAccount {
-        let account_id = ProviderAccountId::new(self.id);
-        let username = ProviderAccountUsername::new(self.email);
+impl From<SpotifyUser> for ProviderAccount {
+    fn from(val: SpotifyUser) -> Self {
+        let account_id = ProviderAccountId::new(val.id);
+        let username = ProviderAccountUsername::new(val.email);
 
-        ProviderAccount {
+        Self {
             account_id,
             username,
         }
@@ -53,11 +53,11 @@ impl Into<ProviderAccount> for SpotifyUser {
 
 #[cfg(test)]
 mod tests {
-    use crate::spotify::user::SpotifyUser;
+    use crate::integrations::spotify::user::SpotifyUser;
 
     #[test]
     fn test_deserialize_user() {
-        let payload = include_str!("../../tests/spotify/payload_user.json");
+        let payload = include_str!("../../../tests/spotify/payload_user.json");
         let json = serde_json::from_str::<SpotifyUser>(&payload).expect("valid json");
 
         assert_eq!(json.id, "darklight956");

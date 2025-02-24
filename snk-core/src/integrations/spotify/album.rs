@@ -1,12 +1,12 @@
 use std::{collections::HashSet, str::FromStr};
 
-use serde::Deserialize;
-use snk_core::{
+use crate::{
     entities::album::Album,
     value_objects::{
         image_cover::ImageCover, product_id::ProductId, provider::provider_id::ProviderId,
     },
 };
+use serde::Deserialize;
 use url::Url;
 
 use super::{
@@ -176,11 +176,11 @@ impl From<SpotifyTrackAlbum> for Album {
 
 #[cfg(test)]
 pub mod tests {
-    use crate::spotify::album::SpotifyAlbum;
+    use crate::integrations::spotify::album::SpotifyAlbum;
 
     #[test]
     fn test_deserialize_album() {
-        let payload = include_str!("../../tests/spotify/payload_album.json");
+        let payload = include_str!("../../../tests/spotify/payload_album.json");
         let json = serde_json::from_str::<SpotifyAlbum>(&payload).expect("valid json");
 
         assert_eq!(json.name, "Global Warming");

@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
+use crate::{entities::artist::Artist, value_objects::provider::provider_id::ProviderId};
 use serde::Deserialize;
-use snk_core::{entities::artist::Artist, value_objects::provider::provider_id::ProviderId};
 use url::Url;
 
 use super::common::{SpotifyExternalUrls, SpotifyFollowers, SpotifyImage};
@@ -72,11 +72,11 @@ pub struct SpotifyArtist {
 
 #[cfg(test)]
 mod tests {
-    use crate::spotify::artist::SpotifyArtist;
+    use crate::integrations::spotify::artist::SpotifyArtist;
 
     #[test]
     fn test_deserialize_artist() {
-        let payload = include_str!("../../tests/spotify/payload_artist.json");
+        let payload = include_str!("../../../tests/spotify/payload_artist.json");
         let json = serde_json::from_str::<SpotifyArtist>(&payload).expect("valid json");
 
         assert_eq!(json.name, "Pitbull");

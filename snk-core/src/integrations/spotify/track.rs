@@ -1,11 +1,11 @@
 use std::collections::HashSet;
 
-use chrono::{DateTime, Utc};
-use serde::Deserialize;
-use snk_core::{
+use crate::{
     entities::track::TrackWithAlbumAndArtists,
     value_objects::{product_id::ProductId, provider::provider_id::ProviderId},
 };
+use chrono::{DateTime, Utc};
+use serde::Deserialize;
 use url::Url;
 
 use super::{
@@ -193,11 +193,11 @@ impl From<SpotifyTrack> for TrackWithAlbumAndArtists {
 
 #[cfg(test)]
 mod tests {
-    use crate::spotify::track::SpotifyTrack;
+    use crate::integrations::spotify::track::SpotifyTrack;
 
     #[test]
     fn test_deserialize_track() {
-        let payload = include_str!("../../tests/spotify/payload_track.json");
+        let payload = include_str!("../../../tests/spotify/payload_track.json");
         let json = serde_json::from_str::<SpotifyTrack>(&payload).expect("valid json");
 
         assert_eq!(json.name, "How Sweet");

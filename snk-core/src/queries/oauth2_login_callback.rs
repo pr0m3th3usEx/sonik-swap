@@ -1,20 +1,23 @@
 use oauth2::{
-    basic::{BasicClient, BasicErrorResponseType},
-    reqwest, AuthorizationCode, Client, ClientId, ClientSecret, RedirectUrl, RequestTokenError,
-    StandardErrorResponse, TokenResponse,
+    basic::BasicClient, reqwest, AuthorizationCode, ClientId, ClientSecret, RedirectUrl,
+    TokenResponse,
 };
 use thiserror::Error;
 
 use crate::{
     contracts::{
-        providers::token_provider::TokenProvider,
+        providers::token_provider::{TokenProvider, TokenProviderError},
         repositories::{
             music_account_provider_repository::{
                 MusicAccountProviderRepository, MusicAccountProviderRepositoryError,
             },
-            user_repository::UserRepository,
+            provider_account_repository::ProviderAccountRepositoryError,
+            user_repository::{UserRepository, UserRepositoryError},
         },
     },
+    integrations::get_account_provider_repo,
+    queries::LoginUserQueryOutput,
+    utils::auth::generate_token_pair,
     value_objects::provider::provider_id::ProviderId,
 };
 
@@ -26,6 +29,8 @@ pub struct LoginOAuth2CallbackQuery {
 
 #[derive(Debug, Error)]
 pub enum LoginOAuth2CallbackQueryError {
+    #[error("Could not find an account related")]
+    NoUserRelated,
     #[error("Provider not found")]
     ProviderNotFound,
     #[error("Authentication with {0} unavailable")]
@@ -36,6 +41,24 @@ pub enum LoginOAuth2CallbackQueryError {
 
 impl From<MusicAccountProviderRepositoryError> for LoginOAuth2CallbackQueryError {
     fn from(error: MusicAccountProviderRepositoryError) -> Self {
+        Self::InternalError(error.to_string())
+    }
+}
+
+impl From<ProviderAccountRepositoryError> for LoginOAuth2CallbackQueryError {
+    fn from(error: ProviderAccountRepositoryError) -> Self {
+        Self::InternalError(error.to_string())
+    }
+}
+
+impl From<UserRepositoryError> for LoginOAuth2CallbackQueryError {
+    fn from(error: UserRepositoryError) -> Self {
+        Self::InternalError(error.to_string())
+    }
+}
+
+impl From<TokenProviderError> for LoginOAuth2CallbackQueryError {
+    fn from(error: TokenProviderError) -> Self {
         Self::InternalError(error.to_string())
     }
 }
@@ -59,7 +82,7 @@ impl LoginOAuth2CallbackQuery {
         auth_repo: &impl MusicAccountProviderRepository,
         access_token_provider: &impl TokenProvider,
         refresh_token_provider: &impl TokenProvider,
-    ) -> Result<(), LoginOAuth2CallbackQueryError> {
+    ) -> Result<LoginUserQueryOutput, LoginOAuth2CallbackQueryError> {
         let (client_id, client_secret) = match self.provider_id.as_str() {
             "spotify" => (
                 ClientId::new(std::env::var("SPOTIFY_OAUTH2_CLIENT_ID").unwrap()),
@@ -106,14 +129,52 @@ impl LoginOAuth2CallbackQuery {
                 LoginOAuth2CallbackQueryError::InternalError(err.to_string())
             })?;
 
-        tracing::debug!("Extra fields: {:?}", token_response.extra_fields());
-        tracing::debug!("Access token: {:?}", token_response.access_token());
-        tracing::debug!("Refresh token: {:?}", token_response.refresh_token());
+        let access_token = token_response.access_token();
 
-        // Get profile information
-        // Get user account with oauth2 allowed methods
-        // Check if provider method is allowed
+        tracing::info!("Extra fields: {:?}", token_response.extra_fields());
+        tracing::info!("Access token: {:?}", token_response.access_token());
+        tracing::info!("Refresh token: {:?}", token_response.refresh_token());
 
-        Ok(())
+        let external_account_info = {
+            let provider_account_repo = match get_account_provider_repo(
+                &self.provider_id,
+                access_token.secret().to_string(),
+            ) {
+                Ok(provider_account_repo) => provider_account_repo,
+
+                Err(err) => {
+                    tracing::error!({ %err });
+                    return Err(LoginOAuth2CallbackQueryError::InternalError(
+                        "could not build external provider accuont repo".to_string(),
+                    ));
+                }
+            };
+
+            provider_account_repo.get_logged_user().await?
+        };
+
+        tracing::info!({ ?external_account_info }, "External account");
+
+        // TODO Get user account with oauth2 allowed methods
+
+        let Some(user) = user_repo
+            .get_user_provider_account_id(&self.provider_id, &external_account_info)
+            .await?
+        else {
+            return Err(LoginOAuth2CallbackQueryError::NoUserRelated);
+        };
+
+        // Grant access & refresh token
+        Ok(
+            generate_token_pair(user.id(), access_token_provider, refresh_token_provider)
+                .await
+                .map(
+                    |(access_token, refresh_token, expires_in)| LoginUserQueryOutput {
+                        access_token,
+                        refresh_token,
+                        expires_in,
+                    },
+                )?,
+        )
     }
 }

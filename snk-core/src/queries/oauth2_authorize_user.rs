@@ -3,7 +3,9 @@ use thiserror::Error;
 use url::Url;
 
 use crate::{
-    contracts::repositories::music_account_provider_repository::{MusicAccountProviderRepository, MusicAccountProviderRepositoryError},
+    contracts::repositories::music_account_provider_repository::{
+        MusicAccountProviderRepository, MusicAccountProviderRepositoryError,
+    },
     value_objects::provider::provider_id::ProviderId,
 };
 
@@ -31,10 +33,7 @@ pub struct OAuth2AuthorizeUserQuery {
 }
 
 impl OAuth2AuthorizeUserQuery {
-    pub fn new(
-        provider_id: ProviderId,
-        redirect_url: RedirectUrl,
-    ) -> Self {
+    pub fn new(provider_id: ProviderId, redirect_url: RedirectUrl) -> Self {
         Self {
             provider_id,
             redirect_url,

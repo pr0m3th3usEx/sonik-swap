@@ -4,12 +4,8 @@ use std::{
     time::Duration,
 };
 
-use crate::deezer::{error::DeezerErrorType, DeezerResponse, API_URL};
-use reqwest::{
-    header::{HeaderMap, HeaderValue},
-    Client, StatusCode,
-};
-use snk_core::{
+use crate::integrations::deezer::{error::DeezerErrorType, DeezerResponse, API_URL};
+use crate::{
     contracts::repositories::playlist_repository::{
         PlaylistRepository, PlaylistRepositoryError, PlaylistRepositoryResult,
     },
@@ -18,6 +14,10 @@ use snk_core::{
         track::TrackWithAlbumAndArtists,
     },
     value_objects::{image_cover::ImageCover, playlist_id::PlaylistId},
+};
+use reqwest::{
+    header::{HeaderMap, HeaderValue},
+    Client, StatusCode,
 };
 use url::Url;
 

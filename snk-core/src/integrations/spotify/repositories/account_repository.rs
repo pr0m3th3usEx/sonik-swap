@@ -1,15 +1,16 @@
 use std::time::Duration;
 
-use oauth2::http::{HeaderMap, HeaderValue};
-use reqwest::Client;
-use snk_core::{
+use crate::{
     contracts::repositories::provider_account_repository::{
         ProviderAccountRepository, ProviderAccountRepositoryError, ProviderAccountRepositoryResult,
     },
     entities::provider_account::ProviderAccount,
 };
+use async_trait::async_trait;
+use oauth2::http::{HeaderMap, HeaderValue};
+use reqwest::{header::AUTHORIZATION, Client};
 
-use crate::spotify::{user::SpotifyUser, API_URL};
+use crate::integrations::spotify::{user::SpotifyUser, API_URL};
 
 pub struct SpotifyProviderAccountRepository {
     http_client: Client,
@@ -19,14 +20,16 @@ impl SpotifyProviderAccountRepository {
     pub fn new(access_token: String) -> Result<Self, &'static str> {
         let mut default_headers = HeaderMap::new();
 
-        default_headers.insert("Accept", HeaderValue::from_static("application/json"));
-        default_headers.insert(
-            "Authorization",
-            format!("Bearer: {}", access_token).parse().map_err(|err| {
+        let mut bearer_token: HeaderValue =
+            format!("Bearer {}", access_token).parse().map_err(|err| {
                 eprintln!("{:?}", err);
                 "SpotifyProviderAccountRepository::new: Could not parse header value"
-            })?,
-        );
+            })?;
+
+        bearer_token.set_sensitive(true);
+
+        default_headers.insert("Accept", HeaderValue::from_static("application/json"));
+        default_headers.insert(AUTHORIZATION, bearer_token);
 
         Ok(Self {
             http_client: Client::builder()
@@ -41,6 +44,7 @@ impl SpotifyProviderAccountRepository {
     }
 }
 
+#[async_trait]
 impl ProviderAccountRepository for SpotifyProviderAccountRepository {
     async fn get_logged_user(&self) -> ProviderAccountRepositoryResult<ProviderAccount> {
         let url = format!("{}/me", API_URL);
@@ -51,7 +55,7 @@ impl ProviderAccountRepository for SpotifyProviderAccountRepository {
           .await
           .map_err(|err| {
             ProviderAccountRepositoryError::ServiceError(
-                format!("SpotifyProviderAccountRepository::get_logged_user: error while sending request: {}", err.to_string()
+                format!("SpotifyProviderAccountRepository::get_logged_user: error while sending request: {}", err
             ))
         })?;
 

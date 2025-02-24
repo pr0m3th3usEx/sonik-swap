@@ -1,7 +1,7 @@
 [workspace]
 resolver = '2'
 
-members = ["adapters", "applications/api", "integrations", "snk-core"]
+members = ["adapters", "applications/api", "snk-core"]
 
 [workspace.dependencies]
 tokio = { version = "1.42.0", features = ['full'] }

@@ -1,8 +1,8 @@
 use std::{collections::HashMap, str::FromStr};
 
+use crate::value_objects::provider::provider_id::ProviderId;
 use chrono::{DateTime, NaiveDateTime, Utc};
 use serde::{Deserialize, Serialize};
-use snk_core::value_objects::provider::provider_id::ProviderId;
 use url::Url;
 
 #[derive(Debug, Deserialize)]

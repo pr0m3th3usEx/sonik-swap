@@ -1,10 +1,10 @@
 use std::collections::HashSet;
 
-use serde::Deserialize;
-use snk_core::{
+use crate::{
     entities::playlist::Playlist,
     value_objects::{image_cover::ImageCover, playlist_id::PlaylistId},
 };
+use serde::Deserialize;
 use url::Url;
 
 use super::artist::ReducedArtist;
@@ -83,11 +83,11 @@ impl From<DeezerPlaylist> for Playlist {
 
 #[cfg(test)]
 mod tests {
-    use crate::deezer::playlist::DeezerPlaylist;
+    use crate::integrations::deezer::playlist::DeezerPlaylist;
 
     #[test]
     pub fn test_deserialize_playlist() {
-        let json_str = include_str!("../../tests/deezer/payload_playlist.json");
+        let json_str = include_str!("../../../tests/deezer/payload_playlist.json");
         let json = serde_json::from_str::<DeezerPlaylist>(&json_str).expect("valid json");
 
         assert_eq!(json.title, "Women of Rap");

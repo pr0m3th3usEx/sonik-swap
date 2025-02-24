@@ -1,3 +1,4 @@
+use async_trait::async_trait;
 use thiserror::Error;
 
 use crate::entities::provider_account::ProviderAccount;
@@ -10,6 +11,7 @@ pub enum ProviderAccountRepositoryError {
 
 pub type ProviderAccountRepositoryResult<T> = Result<T, ProviderAccountRepositoryError>;
 
-pub trait ProviderAccountRepository {
+#[async_trait]
+pub trait ProviderAccountRepository: Send + Sync {
     async fn get_logged_user(&self) -> ProviderAccountRepositoryResult<ProviderAccount>;
 }

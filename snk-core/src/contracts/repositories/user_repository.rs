@@ -1,8 +1,8 @@
 use thiserror::Error;
 
 use crate::{
-    entities::user::User,
-    value_objects::{misc::email::Email, user::user_id::UserId},
+    entities::{provider_account::ProviderAccount, user::User},
+    value_objects::{misc::email::Email, provider::provider_id::ProviderId, user::user_id::UserId},
 };
 
 #[derive(Debug, Error)]
@@ -19,6 +19,12 @@ pub trait UserRepository: Send + Sync {
     async fn update(&self, old: User, new: User) -> UserRepositoryResult<User>;
 
     async fn get(&self, user_id: &UserId) -> UserRepositoryResult<Option<User>>;
+
+    async fn get_user_provider_account_id(
+        &self,
+        provider_id: &ProviderId,
+        external_account_info: &ProviderAccount,
+    ) -> UserRepositoryResult<Option<User>>;
 
     async fn get_from_email(&self, email: &Email) -> UserRepositoryResult<Option<User>>;
 

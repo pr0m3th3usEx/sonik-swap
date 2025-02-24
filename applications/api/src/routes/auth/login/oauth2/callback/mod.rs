@@ -55,6 +55,7 @@ impl From<LoginOAuth2CallbackQueryError> for OAuth2LoginCallbackError {
             LoginOAuth2CallbackQueryError::InternalError(_) => {
                 OAuth2LoginCallbackError::InternalError
             }
+            LoginOAuth2CallbackQueryError::NoUserRelated => OAuth2LoginCallbackError::NotFound,
         }
     }
 }
@@ -85,7 +86,7 @@ pub async fn handler<
         OAuth2CallbackRequestParams,
         OAuth2CallbackRequestParamsParsed,
     >,
-) -> Result</* LoginResponse */ (), OAuth2LoginCallbackError>
+) -> Result<LoginResponse, OAuth2LoginCallbackError>
 where
     UserRepo: UserRepository,
     MusicAccountProvRepo: MusicAccountProviderRepository,
@@ -94,16 +95,15 @@ where
     AccessTokenProv: TokenProvider,
     RefreshTokenProv: TokenProvider,
 {
-    tracing::debug!("EHHHEHEh");
-    let response =
-        LoginOAuth2CallbackQuery::new(params.provider_id, query.redirect_url, query.code)
-            .execute(
-                &state.user_repo,
-                &state.music_account_provider_repo,
-                &state.access_token_provider,
-                &state.refresh_token_provider,
-            )
-            .await?;
+    tracing::info!("EHHHEHEh");
+    let output = LoginOAuth2CallbackQuery::new(params.provider_id, query.redirect_url, query.code)
+        .execute(
+            &state.user_repo,
+            &state.music_account_provider_repo,
+            &state.access_token_provider,
+            &state.refresh_token_provider,
+        )
+        .await?;
 
-    Ok(())
+    Ok(LoginResponse::from(output))
 }

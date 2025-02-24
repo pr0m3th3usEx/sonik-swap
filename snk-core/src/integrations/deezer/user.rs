@@ -1,10 +1,10 @@
-use serde::Deserialize;
-use snk_core::{
+use crate::{
     entities::provider_account::ProviderAccount,
     value_objects::provider_account::{
         provider_account_id::ProviderAccountId, provider_account_username::ProviderAccountUsername,
     },
 };
+use serde::Deserialize;
 use url::Url;
 
 #[derive(Debug, Deserialize)]
@@ -32,12 +32,12 @@ pub struct DeezerUser {
     pub tracklist: Option<Url>,
 }
 
-impl Into<ProviderAccount> for DeezerUser {
-    fn into(self) -> ProviderAccount {
-        let account_id = ProviderAccountId::new(self.id);
-        let username = ProviderAccountUsername::new(self.email);
+impl From<DeezerUser> for ProviderAccount {
+    fn from(val: DeezerUser) -> Self {
+        let account_id = ProviderAccountId::new(val.id);
+        let username = ProviderAccountUsername::new(val.email);
 
-        ProviderAccount {
+        Self {
             account_id,
             username,
         }

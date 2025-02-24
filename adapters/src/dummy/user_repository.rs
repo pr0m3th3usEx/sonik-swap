@@ -103,4 +103,29 @@ impl UserRepository for DummyUserRepository {
             ),
         ))
     }
+
+    async fn get_user_provider_account_id(
+        &self,
+        _provider_id: &snk_core::value_objects::provider::provider_id::ProviderId,
+        _external_account_info: &snk_core::entities::provider_account::ProviderAccount,
+    ) -> UserRepositoryResult<Option<User>> {
+        Ok(Some(User::new(
+            UserId::new(Uuid::new_v4()).unwrap(),
+            Email::new("dummy@test.test").unwrap(),
+            true,
+            UserPassword::from_hash("hashed_password"),
+            Some(
+                Date::new(Into::<DateTime<Utc>>::into(
+                    DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00").unwrap(),
+                ))
+                .unwrap(),
+            ),
+            Some(
+                Date::new(Into::<DateTime<Utc>>::into(
+                    DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00").unwrap(),
+                ))
+                .unwrap(),
+            ),
+        )))
+    }
 }

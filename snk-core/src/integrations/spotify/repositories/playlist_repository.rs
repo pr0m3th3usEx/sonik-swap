@@ -3,14 +3,7 @@ use std::{
     time::Duration,
 };
 
-use common::{SpotifyList, SpotifyUri};
-use playlist::{SpotifyPlaylist, SpotifySimplifiedPlaylist};
-use reqwest::{
-    header::{HeaderMap, HeaderValue},
-    Client,
-};
-use serde_json::json;
-use snk_core::{
+use crate::{
     contracts::repositories::playlist_repository::{
         PlaylistRepository, PlaylistRepositoryError, PlaylistRepositoryResult,
     },
@@ -20,10 +13,17 @@ use snk_core::{
     },
     value_objects::{image_cover::ImageCover, playlist_id::PlaylistId},
 };
+use common::{SpotifyList, SpotifyUri};
+use playlist::{SpotifyPlaylist, SpotifySimplifiedPlaylist};
+use reqwest::{
+    header::{HeaderMap, HeaderValue},
+    Client,
+};
+use serde_json::json;
 use track::SpotifySavedTrack;
 use url::Url;
 
-use crate::spotify::{common, playlist, track, API_URL};
+use crate::integrations::spotify::{common, playlist, track, API_URL};
 
 pub struct SpotifyPlaylistRepository<'a> {
     http_client: Client,

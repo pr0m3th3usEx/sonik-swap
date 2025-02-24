@@ -1,13 +1,13 @@
 use std::collections::{HashMap, HashSet};
 
-use chrono::NaiveDateTime;
-use serde::Deserialize;
-use snk_core::{
+use crate::{
     entities::{album::Album, artist::Artist, track::TrackWithAlbumAndArtists},
     value_objects::{
         image_cover::ImageCover, product_id::ProductId, provider::provider_id::ProviderId,
     },
 };
+use chrono::NaiveDateTime;
+use serde::Deserialize;
 use url::Url;
 
 use super::{album::ReducedAlbum, artist::ReducedArtist};
@@ -208,11 +208,11 @@ fn get_artists(reduced_artists: Vec<ReducedArtist>) -> Result<Vec<Artist>, &'sta
 
 #[cfg(test)]
 mod tests {
-    use crate::deezer::track::DeezerTrack;
+    use crate::integrations::deezer::track::DeezerTrack;
 
     #[test]
     pub fn test_deserialize_playlist() {
-        let json_str = include_str!("../../tests/deezer/payload_track.json");
+        let json_str = include_str!("../../../tests/deezer/payload_track.json");
         let json = serde_json::from_str::<DeezerTrack>(&json_str).expect("valid json");
 
         assert_eq!(json.title, "How Sweet");

@@ -1,15 +1,16 @@
 use std::time::Duration;
 
-use oauth2::http::{HeaderMap, HeaderValue};
-use reqwest::{Client, StatusCode};
-use snk_core::{
+use crate::{
     contracts::repositories::provider_account_repository::{
         ProviderAccountRepository, ProviderAccountRepositoryError, ProviderAccountRepositoryResult,
     },
     entities::provider_account::ProviderAccount,
 };
+use async_trait::async_trait;
+use oauth2::http::{HeaderMap, HeaderValue};
+use reqwest::{Client, StatusCode};
 
-use crate::deezer::{DeezerResponse, API_URL};
+use crate::integrations::deezer::{DeezerResponse, API_URL};
 
 pub struct DeezerProviderAccountRepository {
     http_client: Client,
@@ -41,9 +42,10 @@ impl DeezerProviderAccountRepository {
     }
 }
 
+#[async_trait]
 impl ProviderAccountRepository for DeezerProviderAccountRepository {
     async fn get_logged_user(&self) -> ProviderAccountRepositoryResult<ProviderAccount> {
-        let url = format!("{}/", API_URL);
+        let url = format!("{}/me", API_URL);
 
         let response = self
             .http_client
@@ -65,7 +67,7 @@ impl ProviderAccountRepository for DeezerProviderAccountRepository {
                             deezer_error_payload.error.message,
                         ))
                     }
-                    DeezerResponse::User(user) => Ok(user.into()),
+                    DeezerResponse::User(user) => Ok((*user).into()),
                     _ => Err(ProviderAccountRepositoryError::ServiceError(
                         "bad response format".to_string(),
                     )),

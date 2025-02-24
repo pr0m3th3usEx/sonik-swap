@@ -16,10 +16,11 @@ axum = { version =  "0.7.9", features = ["macros"] }
 
 tracing = "0.1.41"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
-tower-http = { version = "0.6.2", features = ["trace"] }
+tower-http = { version = "0.6.2", features = ["trace", "catch-panic"] }
 
 # Business core
 snk-core.workspace = true
 
 # Adapters
 adapters.workspace = true
+tower = "0.5.2"

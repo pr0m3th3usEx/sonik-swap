@@ -1,5 +1,5 @@
-use integrations::deezer::DeezerPlaylistRepository;
 use oauth2::{AuthUrl, Scope, TokenUrl};
+use snk_core::integrations::deezer::repositories::playlist_repository::DeezerPlaylistRepository;
 use snk_core::{
     contracts::repositories::playlist_repository::PlaylistRepository,
     entities::music_account_provider::MusicAccountProvider,

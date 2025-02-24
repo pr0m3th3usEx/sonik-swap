@@ -6,3 +6,4 @@ pub mod playlist;
 pub mod provider_account;
 pub mod track;
 pub mod user;
+pub mod user_oauth2_external_account;

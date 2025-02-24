@@ -16,9 +16,11 @@ use snk_core::{
             user_repository::UserRepository,
         },
     },
-    queries::credentials_authorize_user::{
-        CredentialsAuthorizeUserQuery, CredentialsAuthorizeUserQueryError,
-        CredentialsAuthorizeUserQueryOutput,
+    queries::{
+        credentials_authorize_user::{
+            CredentialsAuthorizeUserQuery, CredentialsAuthorizeUserQueryError,
+        },
+        LoginUserQueryOutput,
     },
 };
 
@@ -44,8 +46,8 @@ impl From<CredentialsAuthorizeUserQueryError> for LoginError {
     }
 }
 
-impl From<CredentialsAuthorizeUserQueryOutput> for LoginResponse {
-    fn from(output: CredentialsAuthorizeUserQueryOutput) -> Self {
+impl From<LoginUserQueryOutput> for LoginResponse {
+    fn from(output: LoginUserQueryOutput) -> Self {
         Self {
             access_token: output.access_token,
             refresh_token: output.refresh_token,

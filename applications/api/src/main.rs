@@ -13,12 +13,34 @@ use adapters::{
     },
 };
 use axum::{
+    body::Body,
+    http::Response,
     routing::{get, post},
     Router,
 };
 use routes::auth::{login, signup};
-use tower_http::trace::TraceLayer;
+use tower::ServiceBuilder;
+use tower_http::{catch_panic::CatchPanicLayer, trace::TraceLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
+
+fn handle_panic(err: Box<dyn std::any::Any + Send + 'static>) -> Response<Body> {
+    // Log the panic with its details
+    let details = if let Some(s) = err.downcast_ref::<String>() {
+        s.clone()
+    } else if let Some(s) = err.downcast_ref::<&str>() {
+        s.to_string()
+    } else {
+        "Unknown panic message".to_string()
+    };
+
+    tracing::error!("Server panic: {}", details);
+
+    // Return a 500 Internal Server Error response
+    Response::builder()
+        .status(500)
+        .body(Body::from("Internal Server Error"))
+        .unwrap()
+}
 
 #[tokio::main]
 async fn main() {
@@ -92,7 +114,13 @@ async fn main() {
     let app = Router::new()
         .route("/api", get(health))
         .nest("/api/auth", auth_routes)
-        .layer(TraceLayer::new_for_http())
+        .layer(
+            ServiceBuilder::new()
+                // Add panic catching - this should be first (innermost) layer
+                .layer(CatchPanicLayer::custom(handle_panic))
+                // Add tracing with default configuration
+                .layer(TraceLayer::new_for_http()),
+        )
         .with_state(state::AppState {
             user_repo: user_repository,
             user_id_provider,

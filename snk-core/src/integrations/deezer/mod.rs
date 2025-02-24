@@ -26,16 +26,15 @@ pub struct DeezerList<T> {
 enum DeezerResponse {
     Error(DeezerErrorPayload),
     Playlist(Box<DeezerPlaylist>),
-    User(DeezerUser),
+    User(Box<DeezerUser>),
     ListPlaylists(DeezerList<DeezerPlaylist>),
     ListTracks(DeezerList<DeezerTrack>),
     ActionResult(()),
 }
 
-
 #[cfg(test)]
 mod tests {
-    use crate::deezer::API_URL;
+    use crate::integrations::deezer::API_URL;
     use std::collections::HashMap;
 
     #[test]

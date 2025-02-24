@@ -81,13 +81,13 @@ pub struct DeezerAlbum {
 
 #[cfg(test)]
 mod tests {
-    use crate::deezer::artist::DeezerIdType;
+    use crate::integrations::deezer::artist::DeezerIdType;
 
     use super::DeezerAlbum;
 
     #[test]
     pub fn test_deserialize_album() {
-        let json_str = include_str!("../../tests/deezer/payload_album.json");
+        let json_str = include_str!("../../../tests/deezer/payload_album.json");
         let json = serde_json::from_str::<DeezerAlbum>(&json_str).expect("valid json");
 
         assert_eq!(json.title, "How Sweet");

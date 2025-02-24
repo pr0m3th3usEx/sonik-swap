@@ -1,37 +1,77 @@
-use std::sync::{Arc, RwLock};
+use core::panic;
+use std::{
+    collections::HashMap,
+    sync::{Arc, RwLock},
+};
 
 use snk_core::{
     contracts::repositories::user_repository::{
         UserRepository, UserRepositoryError, UserRepositoryResult,
     },
-    entities::user::User,
-    value_objects::{misc::email::Email, user::user_id::UserId},
+    entities::{
+        provider_account::ProviderAccount, user::User,
+        user_oauth2_external_account::UserOAuth2ExternalAccount,
+    },
+    value_objects::{misc::email::Email, provider::provider_id::ProviderId, user::user_id::UserId},
 };
 
 #[derive(Clone)]
 pub struct InMemoryUserRepository {
     users: Arc<RwLock<Vec<User>>>,
+    users_oauth2_accounts: Arc<RwLock<HashMap<(ProviderId, UserId), UserOAuth2ExternalAccount>>>,
+}
+
+impl InMemoryUserRepository {
+    pub async fn fake_oauth2_link(
+        &self,
+        user_id: &UserId,
+        provider_id: &ProviderId,
+        provider_account_info: ProviderAccount,
+    ) {
+        let mut users_oauth2_accounts_store =
+            self.users_oauth2_accounts.write().expect("lock poisoned");
+
+        let Some(external_account_info) =
+            users_oauth2_accounts_store.get_mut(&(provider_id.clone(), *user_id))
+        else {
+            panic!("Add a user first !");
+        };
+
+        external_account_info.provider_account_info = Some(provider_account_info);
+    }
 }
 
 impl Default for InMemoryUserRepository {
     fn default() -> Self {
         InMemoryUserRepository {
             users: Arc::new(RwLock::new(Vec::new())),
+            users_oauth2_accounts: Arc::new(RwLock::new(HashMap::new())),
         }
     }
 }
 
 impl UserRepository for InMemoryUserRepository {
     async fn add(&self, user: User) -> UserRepositoryResult<User> {
-        let mut store = self.users.write().expect("lock poisoned");
+        let mut user_store: std::sync::RwLockWriteGuard<'_, Vec<User>> =
+            self.users.write().expect("lock poisoned");
+        let mut users_oauth2_accounts_store =
+            self.users_oauth2_accounts.write().expect("lock poisoned");
 
-        if store.iter().any(|u| u.email == user.email) {
+        if user_store.iter().any(|u| u.email == user.email) {
             return Err(UserRepositoryError::ServiceError(
                 "User already exists".to_string(),
             ));
         }
 
-        store.push(user.clone());
+        user_store.push(user.clone());
+
+        // Add external oauth accounts default (only spotify for test)
+        let spotify_provider_id = ProviderId::new("spotify".to_string());
+        users_oauth2_accounts_store.insert(
+            (spotify_provider_id.clone(), user.id),
+            UserOAuth2ExternalAccount::new(spotify_provider_id, user.id, None),
+        );
+
         Ok(user)
     }
 
@@ -83,6 +123,36 @@ impl UserRepository for InMemoryUserRepository {
             )),
         }
     }
+
+    async fn get_user_provider_account_id(
+        &self,
+        provider_id: &ProviderId,
+        external_account_info: &ProviderAccount,
+    ) -> UserRepositoryResult<Option<User>> {
+        let store = self.users.read().expect("lock poisoned");
+        let user_oauth2_external_account_store =
+            self.users_oauth2_accounts.read().expect("lock poisoned");
+        let mut found_user_id: Option<UserId> = None;
+
+        for (key, accounts_info) in user_oauth2_external_account_store.iter() {
+            if key.0 != *provider_id {
+                continue;
+            }
+
+            if let Some(info) = &accounts_info.provider_account_info {
+                if info.account_id == external_account_info.account_id {
+                    found_user_id = Some(accounts_info.user_id);
+                    break;
+                }
+            }
+        }
+
+        let Some(user_id) = found_user_id else {
+            return Ok(None);
+        };
+
+        Ok(store.iter().find(|u| u.id == user_id).cloned())
+    }
 }
 
 #[cfg(test)]
@@ -90,9 +160,14 @@ mod tests {
     use chrono::{DateTime, Utc};
     use snk_core::{
         contracts::repositories::user_repository::UserRepository,
-        entities::user::User,
+        entities::{provider_account::ProviderAccount, user::User},
         value_objects::{
             misc::{date::Date, email::Email},
+            provider::provider_id::ProviderId,
+            provider_account::{
+                provider_account_id::ProviderAccountId,
+                provider_account_username::ProviderAccountUsername,
+            },
             user::{user_id::UserId, user_password::UserPassword},
         },
     };
@@ -187,6 +262,54 @@ mod tests {
             .unwrap();
 
         assert_eq!(result, Some(user));
+    }
+
+    #[tokio::test]
+    async fn test_get_user_provider_account_id() {
+        let repository = InMemoryUserRepository::default();
+        let user = User::new(
+            UserId::new(Uuid::new_v4()).unwrap(),
+            Email::new("dummy@test.test").unwrap(),
+            true,
+            UserPassword::from_hash("hashed_password"),
+            Some(
+                Date::new(Into::<DateTime<Utc>>::into(
+                    DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00").unwrap(),
+                ))
+                .unwrap(),
+            ),
+            Some(
+                Date::new(Into::<DateTime<Utc>>::into(
+                    DateTime::parse_from_rfc3339("2020-04-12T22:10:57+02:00").unwrap(),
+                ))
+                .unwrap(),
+            ),
+        );
+
+        let spotify_provider_id = ProviderId::new("spotify".to_string());
+        let spotify_provider_account_info = ProviderAccount {
+            account_id: ProviderAccountId::new("testtest123".to_string()),
+            username: ProviderAccountUsername::new("dahyun@twice.kr".to_string()),
+        };
+
+        let _ = repository.add(user.clone()).await.unwrap();
+
+        repository
+            .fake_oauth2_link(
+                user.id(),
+                &spotify_provider_id,
+                spotify_provider_account_info.clone(),
+            )
+            .await;
+
+        // Get from external account
+        let result = repository
+            .get_user_provider_account_id(&spotify_provider_id, &spotify_provider_account_info)
+            .await
+            .expect("should be ok");
+
+        assert!(result.is_some());
+        assert_eq!(result.unwrap().id(), user.id());
     }
 
     #[tokio::test]
